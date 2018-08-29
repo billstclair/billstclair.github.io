@@ -5306,7 +5306,13 @@ var author$project$Table$view = F3(
 				elm$core$List$map,
 				A2(author$project$Table$toHeaderInfo, state, toMsg),
 				columns));
-		var thead = A2(elm$html$Html$thead, theadDetails.attributes, theadDetails.children);
+		var thead = A2(
+			elm$html$Html$thead,
+			theadDetails.attributes,
+			_List_fromArray(
+				[
+					A2(elm$html$Html$tr, _List_Nil, theadDetails.children)
+				]));
 		var sortedData = A3(author$project$Table$sort, state, columns, data);
 		var tbody = A3(
 			elm$html$Html$Keyed$node,
