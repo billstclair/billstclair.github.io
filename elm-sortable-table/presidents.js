@@ -4894,7 +4894,7 @@ var author$project$Table$darkGrey = function (symbol) {
 			]),
 		_List_fromArray(
 			[
-				elm$html$Html$text(' ' + symbol)
+				elm$html$Html$text('\u00a0' + symbol)
 			]));
 };
 var author$project$Table$lightGrey = function (symbol) {
@@ -4906,7 +4906,7 @@ var author$project$Table$lightGrey = function (symbol) {
 			]),
 		_List_fromArray(
 			[
-				elm$html$Html$text(' ' + symbol)
+				elm$html$Html$text('\u00a0' + symbol)
 			]));
 };
 var elm$html$Html$th = _VirtualDom_node('th');
@@ -5183,6 +5183,14 @@ var author$project$Table$sort = F3(
 			return A3(author$project$Table$applySorter, isReversed, sorter, data);
 		}
 	});
+var author$project$Table$getSortedData = F3(
+	function (_n0, state, data) {
+		var toId = _n0.a.toId;
+		var toMsg = _n0.a.toMsg;
+		var columns = _n0.a.columns;
+		var customizations = _n0.a.customizations;
+		return A3(author$project$Table$sort, state, columns, data);
+	});
 var author$project$Table$Reversible = function (a) {
 	return {$: 'Reversible', a: a};
 };
@@ -5296,11 +5304,11 @@ var elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
 };
 var elm$html$Html$Keyed$node = elm$virtual_dom$VirtualDom$keyedNode;
 var author$project$Table$view = F3(
-	function (_n0, state, data) {
-		var toId = _n0.a.toId;
-		var toMsg = _n0.a.toMsg;
-		var columns = _n0.a.columns;
-		var customizations = _n0.a.customizations;
+	function (conf, state, data) {
+		var toId = conf.a.toId;
+		var toMsg = conf.a.toMsg;
+		var columns = conf.a.columns;
+		var customizations = conf.a.customizations;
 		var theadDetails = customizations.thead(
 			A2(
 				elm$core$List$map,
@@ -5313,7 +5321,7 @@ var author$project$Table$view = F3(
 				[
 					A2(elm$html$Html$tr, _List_Nil, theadDetails.children)
 				]));
-		var sortedData = A3(author$project$Table$sort, state, columns, data);
+		var sortedData = A3(author$project$Table$getSortedData, conf, state, data);
 		var tbody = A3(
 			elm$html$Html$Keyed$node,
 			'tbody',
@@ -5323,12 +5331,12 @@ var author$project$Table$view = F3(
 				A3(author$project$Table$viewRow, toId, columns, customizations.rowAttrs),
 				sortedData));
 		var withFoot = function () {
-			var _n2 = customizations.tfoot;
-			if (_n2.$ === 'Nothing') {
+			var _n1 = customizations.tfoot;
+			if (_n1.$ === 'Nothing') {
 				return A2(elm$core$List$cons, tbody, _List_Nil);
 			} else {
-				var attributes = _n2.a.attributes;
-				var children = _n2.a.children;
+				var attributes = _n1.a.attributes;
+				var children = _n1.a.children;
 				return A2(
 					elm$core$List$cons,
 					A2(elm$html$Html$tfoot, attributes, children),
@@ -5339,12 +5347,12 @@ var author$project$Table$view = F3(
 			elm$html$Html$table,
 			customizations.tableAttrs,
 			function () {
-				var _n1 = customizations.caption;
-				if (_n1.$ === 'Nothing') {
+				var _n0 = customizations.caption;
+				if (_n0.$ === 'Nothing') {
 					return A2(elm$core$List$cons, thead, withFoot);
 				} else {
-					var attributes = _n1.a.attributes;
-					var children = _n1.a.children;
+					var attributes = _n0.a.attributes;
+					var children = _n0.a.children;
 					return A2(
 						elm$core$List$cons,
 						A2(elm$html$Html$caption, attributes, children),
