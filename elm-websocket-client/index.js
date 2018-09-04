@@ -4786,9 +4786,9 @@ var author$project$Main$simulatorConfig = author$project$WebSocketClient$makeSim
 var author$project$WebSocketClient$State = function (a) {
 	return {$: 'State', a: a};
 };
-var author$project$WebSocketClient$StateRecord = F6(
-	function (config, openSockets, connectingSockets, closingSockets, socketUrls, queues) {
-		return {closingSockets: closingSockets, config: config, connectingSockets: connectingSockets, openSockets: openSockets, queues: queues, socketUrls: socketUrls};
+var author$project$WebSocketClient$StateRecord = F7(
+	function (config, openSockets, connectingSockets, closingSockets, socketUrls, socketBackoffs, queues) {
+		return {closingSockets: closingSockets, config: config, connectingSockets: connectingSockets, openSockets: openSockets, queues: queues, socketBackoffs: socketBackoffs, socketUrls: socketUrls};
 	});
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
@@ -4798,9 +4798,9 @@ var elm$core$Set$Set_elm_builtin = function (a) {
 var elm$core$Set$empty = elm$core$Set$Set_elm_builtin(elm$core$Dict$empty);
 var author$project$WebSocketClient$makeState = function (config) {
 	return author$project$WebSocketClient$State(
-		A6(author$project$WebSocketClient$StateRecord, config, elm$core$Set$empty, elm$core$Set$empty, elm$core$Set$empty, elm$core$Dict$empty, elm$core$Dict$empty));
+		A7(author$project$WebSocketClient$StateRecord, config, elm$core$Set$empty, elm$core$Set$empty, elm$core$Set$empty, elm$core$Dict$empty, elm$core$Dict$empty, elm$core$Dict$empty));
 };
-var author$project$Main$init = function (flags) {
+var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
 		{
 			config: elm$core$Maybe$Nothing,
@@ -4820,154 +4820,7 @@ var author$project$Main$webSocketClientSub = _Platform_incomingPort('webSocketCl
 var author$project$Main$subscriptions = function (model) {
 	return author$project$Main$webSocketClientSub(author$project$Main$Receive);
 };
-var author$project$WebSocketClient$closedCodeToString = function (code) {
-	switch (code.$) {
-		case 'NormalClosure':
-			return 'Normal';
-		case 'GoingAwayClosure':
-			return 'GoingAway';
-		case 'ProtocolErrorClosure':
-			return 'ProtocolError';
-		case 'UnsupprtedDataClosure':
-			return 'UnsupprtedData';
-		case 'NoStatusRecvdClosure':
-			return 'NoStatusRecvd';
-		case 'AbnormalClosure':
-			return 'Abnormal';
-		case 'InvalidFramePayloadDataClosure':
-			return 'InvalidFramePayloadData';
-		case 'PolicyViolationClosure':
-			return 'PolicyViolation';
-		case 'MessageTooBigClosure':
-			return 'MessageTooBig';
-		case 'MissingExtensionClosure':
-			return 'MissingExtension';
-		case 'InternalErrorClosure':
-			return 'InternalError';
-		case 'ServiceRestartClosure':
-			return 'ServiceRestart';
-		case 'TryAgainLaterClosure':
-			return 'TryAgainLater';
-		case 'BadGatewayClosure':
-			return 'BadGateway';
-		case 'TLSHandshakeClosure':
-			return 'TLSHandshake';
-		default:
-			return 'UnknownClosureCode';
-	}
-};
-var author$project$Main$closedString = F3(
-	function (code, wasClean, expected) {
-		return 'code: ' + (author$project$WebSocketClient$closedCodeToString(code) + (', ' + ((wasClean ? 'clean' : 'not clean') + (', ' + (expected ? 'expected' : 'NOT expected')))));
-	});
-var author$project$WebSocketClient$maybeStringToString = function (string) {
-	if (string.$ === 'Nothing') {
-		return 'Nothing';
-	} else {
-		var s = string.a;
-		return 'Just \"' + (s + '\"');
-	}
-};
-var author$project$WebSocketClient$errorToString = function (theError) {
-	switch (theError.$) {
-		case 'UnimplementedError':
-			var _function = theError.a._function;
-			return 'UnimplementedError { function = \"' + (_function + '\" }');
-		case 'SocketAlreadyOpenError':
-			var key = theError.a;
-			return 'SocketAlreadyOpenError \"' + (key + '\"');
-		case 'SocketConnectingError':
-			var key = theError.a;
-			return 'SocketConnectingError \"' + (key + '\"');
-		case 'SocketClosingError':
-			var key = theError.a;
-			return 'SocketClosingError \"' + (key + '\"');
-		case 'SocketNotOpenError':
-			var key = theError.a;
-			return 'SocketNotOpenError \"' + (key + '\"');
-		case 'PortDecodeError':
-			var error = theError.a.error;
-			return 'PortDecodeError { error = \"' + (error + '\" }');
-		case 'UnexpectedConnectedError':
-			var key = theError.a.key;
-			var description = theError.a.description;
-			return 'UnexpectedConnectedError\n { key = \"' + (key + ('\", description = \"' + (description + '\" }')));
-		case 'UnexpectedMessageError':
-			var key = theError.a.key;
-			var message = theError.a.message;
-			return 'UnexpectedMessageError { key = \"' + (key + ('\", message = \"' + (message + '\" }')));
-		case 'LowLevelError':
-			var key = theError.a.key;
-			var code = theError.a.code;
-			var description = theError.a.description;
-			var name = theError.a.name;
-			return 'LowLevelError { key = \"' + (author$project$WebSocketClient$maybeStringToString(key) + ('\", code = \"' + (code + ('\", description = \"' + (description + ('\", code = \"' + (author$project$WebSocketClient$maybeStringToString(name) + '\" }')))))));
-		default:
-			var json = theError.a.json;
-			return json;
-	}
-};
-var author$project$Main$processResponse = F2(
-	function (model, _n0) {
-		var state = _n0.a;
-		var response = _n0.b;
-		var mdl = _Utils_update(
-			model,
-			{state: state});
-		switch (response.$) {
-			case 'NoResponse':
-				return _Utils_Tuple2(mdl, elm$core$Platform$Cmd$none);
-			case 'CmdResponse':
-				var cmd = response.a;
-				return _Utils_Tuple2(mdl, cmd);
-			case 'ConnectedResponse':
-				var key = response.a.key;
-				var description = response.a.description;
-				return _Utils_Tuple2(
-					_Utils_update(
-						mdl,
-						{
-							log: A2(elm$core$List$cons, 'Connected', mdl.log)
-						}),
-					elm$core$Platform$Cmd$none);
-			case 'MessageReceivedResponse':
-				var message = response.a.message;
-				return _Utils_Tuple2(
-					_Utils_update(
-						mdl,
-						{
-							log: A2(elm$core$List$cons, 'Received \"' + (message + '\"'), mdl.log)
-						}),
-					elm$core$Platform$Cmd$none);
-			case 'ClosedResponse':
-				var code = response.a.code;
-				var wasClean = response.a.wasClean;
-				var expected = response.a.expected;
-				return _Utils_Tuple2(
-					_Utils_update(
-						mdl,
-						{
-							config: elm$core$Maybe$Nothing,
-							log: A2(
-								elm$core$List$cons,
-								'Closed, ' + A3(author$project$Main$closedString, code, wasClean, expected),
-								mdl.log)
-						}),
-					elm$core$Platform$Cmd$none);
-			default:
-				var error = response.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						mdl,
-						{
-							log: A2(
-								elm$core$List$cons,
-								author$project$WebSocketClient$errorToString(error),
-								model.log)
-						}),
-					elm$core$Platform$Cmd$none);
-		}
-	});
+var author$project$WebSocketClient$PortVersion2 = {$: 'PortVersion2'};
 var author$project$WebSocketClient$CmdResponse = function (a) {
 	return {$: 'CmdResponse', a: a};
 };
@@ -5160,6 +5013,38 @@ var author$project$WebSocketClient$PortMessage$RawPortMessage = F2(
 	function (tag, args) {
 		return {args: args, tag: tag};
 	});
+var author$project$WebSocketClient$PortMessage$encodeContinuation = function (continuation) {
+	return A2(
+		elm$json$Json$Encode$encode,
+		0,
+		function () {
+			if (continuation.$ === 'RetryConnection') {
+				var key = continuation.a;
+				return elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'tag',
+							elm$json$Json$Encode$string('RetryConnection')),
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key))
+						]));
+			} else {
+				var key = continuation.a;
+				return elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'tag',
+							elm$json$Json$Encode$string('DrainOutputQueue')),
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key))
+						]));
+			}
+		}());
+};
 var elm$core$Dict$Black = {$: 'Black'};
 var elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -5328,6 +5213,22 @@ var author$project$WebSocketClient$PortMessage$toRawPortMessage = function (port
 						[
 							_Utils_Tuple2('key', key)
 						])));
+		case 'PODelay':
+			var millis = portMessage.a.millis;
+			var continuation = portMessage.a.continuation;
+			return A2(
+				author$project$WebSocketClient$PortMessage$RawPortMessage,
+				'delay',
+				elm$core$Dict$fromList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'millis',
+							elm$core$String$fromInt(millis)),
+							_Utils_Tuple2(
+							'continuation',
+							author$project$WebSocketClient$PortMessage$encodeContinuation(continuation))
+						])));
 		default:
 			return A2(author$project$WebSocketClient$PortMessage$RawPortMessage, 'invalid', elm$core$Dict$empty);
 	}
@@ -5344,7 +5245,7 @@ var elm$core$Set$insert = F2(
 		return elm$core$Set$Set_elm_builtin(
 			A3(elm$core$Dict$insert, key, _Utils_Tuple0, dict));
 	});
-var author$project$WebSocketClient$openWithKey = F3(
+var author$project$WebSocketClient$openWithKeyInternal = F3(
 	function (_n0, key, url) {
 		var state = _n0.a;
 		var _n1 = A2(author$project$WebSocketClient$checkUsedSocket, state, key);
@@ -5363,7 +5264,8 @@ var author$project$WebSocketClient$openWithKey = F3(
 						_Utils_update(
 							state,
 							{
-								connectingSockets: A2(elm$core$Set$insert, key, state.connectingSockets)
+								connectingSockets: A2(elm$core$Set$insert, key, state.connectingSockets),
+								socketUrls: A3(elm$core$Dict$insert, key, url, state.socketUrls)
 							})),
 					author$project$WebSocketClient$CmdResponse(
 						sendPort(
@@ -5381,9 +5283,163 @@ var author$project$WebSocketClient$openWithKey = F3(
 			}
 		}
 	});
-var author$project$WebSocketClient$open = F2(
-	function (state, url) {
-		return A3(author$project$WebSocketClient$openWithKey, state, url, url);
+var author$project$WebSocketClient$openWithKey = function (_n0) {
+	return author$project$WebSocketClient$openWithKeyInternal;
+};
+var author$project$WebSocketClient$open = F3(
+	function (version, state, url) {
+		return A4(author$project$WebSocketClient$openWithKey, version, state, url, url);
+	});
+var author$project$Main$open = author$project$WebSocketClient$open(author$project$WebSocketClient$PortVersion2);
+var author$project$WebSocketClient$closedCodeToString = function (code) {
+	switch (code.$) {
+		case 'NormalClosure':
+			return 'Normal';
+		case 'GoingAwayClosure':
+			return 'GoingAway';
+		case 'ProtocolErrorClosure':
+			return 'ProtocolError';
+		case 'UnsupprtedDataClosure':
+			return 'UnsupprtedData';
+		case 'NoStatusRecvdClosure':
+			return 'NoStatusRecvd';
+		case 'AbnormalClosure':
+			return 'Abnormal';
+		case 'InvalidFramePayloadDataClosure':
+			return 'InvalidFramePayloadData';
+		case 'PolicyViolationClosure':
+			return 'PolicyViolation';
+		case 'MessageTooBigClosure':
+			return 'MessageTooBig';
+		case 'MissingExtensionClosure':
+			return 'MissingExtension';
+		case 'InternalErrorClosure':
+			return 'InternalError';
+		case 'ServiceRestartClosure':
+			return 'ServiceRestart';
+		case 'TryAgainLaterClosure':
+			return 'TryAgainLater';
+		case 'BadGatewayClosure':
+			return 'BadGateway';
+		case 'TLSHandshakeClosure':
+			return 'TLSHandshake';
+		case 'TimedOutOnReconnect':
+			return 'TimedOutOnReconnect';
+		default:
+			return 'UnknownClosureCode';
+	}
+};
+var author$project$Main$closedString = F3(
+	function (code, wasClean, expected) {
+		return 'code: ' + (author$project$WebSocketClient$closedCodeToString(code) + (', ' + ((wasClean ? 'clean' : 'not clean') + (', ' + (expected ? 'expected' : 'NOT expected')))));
+	});
+var author$project$WebSocketClient$maybeStringToString = function (string) {
+	if (string.$ === 'Nothing') {
+		return 'Nothing';
+	} else {
+		var s = string.a;
+		return 'Just \"' + (s + '\"');
+	}
+};
+var author$project$WebSocketClient$errorToString = function (theError) {
+	switch (theError.$) {
+		case 'UnimplementedError':
+			var _function = theError.a._function;
+			return 'UnimplementedError { function = \"' + (_function + '\" }');
+		case 'SocketAlreadyOpenError':
+			var key = theError.a;
+			return 'SocketAlreadyOpenError \"' + (key + '\"');
+		case 'SocketConnectingError':
+			var key = theError.a;
+			return 'SocketConnectingError \"' + (key + '\"');
+		case 'SocketClosingError':
+			var key = theError.a;
+			return 'SocketClosingError \"' + (key + '\"');
+		case 'SocketNotOpenError':
+			var key = theError.a;
+			return 'SocketNotOpenError \"' + (key + '\"');
+		case 'PortDecodeError':
+			var error = theError.a.error;
+			return 'PortDecodeError { error = \"' + (error + '\" }');
+		case 'UnexpectedConnectedError':
+			var key = theError.a.key;
+			var description = theError.a.description;
+			return 'UnexpectedConnectedError\n { key = \"' + (key + ('\", description = \"' + (description + '\" }')));
+		case 'UnexpectedMessageError':
+			var key = theError.a.key;
+			var message = theError.a.message;
+			return 'UnexpectedMessageError { key = \"' + (key + ('\", message = \"' + (message + '\" }')));
+		case 'LowLevelError':
+			var key = theError.a.key;
+			var code = theError.a.code;
+			var description = theError.a.description;
+			var name = theError.a.name;
+			return 'LowLevelError { key = \"' + (author$project$WebSocketClient$maybeStringToString(key) + ('\", code = \"' + (code + ('\", description = \"' + (description + ('\", code = \"' + (author$project$WebSocketClient$maybeStringToString(name) + '\" }')))))));
+		default:
+			var json = theError.a.json;
+			return json;
+	}
+};
+var author$project$Main$processResponse = F2(
+	function (model, _n0) {
+		var state = _n0.a;
+		var response = _n0.b;
+		var mdl = _Utils_update(
+			model,
+			{state: state});
+		switch (response.$) {
+			case 'NoResponse':
+				return _Utils_Tuple2(mdl, elm$core$Platform$Cmd$none);
+			case 'CmdResponse':
+				var cmd = response.a;
+				return _Utils_Tuple2(mdl, cmd);
+			case 'MessageReceivedResponse':
+				var message = response.a.message;
+				return _Utils_Tuple2(
+					_Utils_update(
+						mdl,
+						{
+							log: A2(elm$core$List$cons, 'Received \"' + (message + '\"'), mdl.log)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'ConnectedResponse':
+				var key = response.a.key;
+				var description = response.a.description;
+				return _Utils_Tuple2(
+					_Utils_update(
+						mdl,
+						{
+							log: A2(elm$core$List$cons, 'Connected', mdl.log)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'ClosedResponse':
+				var code = response.a.code;
+				var wasClean = response.a.wasClean;
+				var expected = response.a.expected;
+				return _Utils_Tuple2(
+					_Utils_update(
+						mdl,
+						{
+							config: elm$core$Maybe$Nothing,
+							log: A2(
+								elm$core$List$cons,
+								'Closed, ' + A3(author$project$Main$closedString, code, wasClean, expected),
+								mdl.log)
+						}),
+					elm$core$Platform$Cmd$none);
+			default:
+				var error = response.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						mdl,
+						{
+							log: A2(
+								elm$core$List$cons,
+								author$project$WebSocketClient$errorToString(error),
+								model.log)
+						}),
+					elm$core$Platform$Cmd$none);
+		}
 	});
 var author$project$Main$connect = F2(
 	function (model, config) {
@@ -5397,20 +5453,110 @@ var author$project$Main$connect = F2(
 		return A2(
 			author$project$Main$processResponse,
 			m,
-			A2(author$project$WebSocketClient$open, m.state, m.url));
+			A2(author$project$Main$open, m.state, m.url));
 	});
+var author$project$WebSocketClient$MessageReceivedResponse = function (a) {
+	return {$: 'MessageReceivedResponse', a: a};
+};
+var author$project$WebSocketClient$NoResponse = {$: 'NoResponse'};
+var author$project$WebSocketClient$SocketNotOpenError = function (a) {
+	return {$: 'SocketNotOpenError', a: a};
+};
+var elm$core$Debug$log = _Debug_log;
+var elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
+		}
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var author$project$WebSocketClient$queueSend = F3(
+	function (state, key, message) {
+		var queues = state.queues;
+		var current = A2(
+			elm$core$Maybe$withDefault,
+			_List_Nil,
+			A2(elm$core$Dict$get, key, queues));
+		var _new = A2(
+			elm$core$List$append,
+			current,
+			_List_fromArray(
+				[
+					A2(elm$core$Debug$log, 'Queueing:', message)
+				]));
+		return _Utils_Tuple2(
+			author$project$WebSocketClient$State(
+				_Utils_update(
+					state,
+					{
+						queues: A3(elm$core$Dict$insert, key, _new, queues)
+					})),
+			author$project$WebSocketClient$NoResponse);
+	});
+var author$project$WebSocketClient$PortMessage$POSend = function (a) {
+	return {$: 'POSend', a: a};
+};
+var elm$core$Basics$not = _Basics_not;
+var author$project$WebSocketClient$send = F4(
+	function (_n0, _n1, key, message) {
+		var state = _n1.a;
+		if (!A2(elm$core$Set$member, key, state.openSockets)) {
+			return _Utils_eq(
+				A2(elm$core$Dict$get, key, state.socketBackoffs),
+				elm$core$Maybe$Nothing) ? _Utils_Tuple2(
+				author$project$WebSocketClient$State(state),
+				author$project$WebSocketClient$ErrorResponse(
+					author$project$WebSocketClient$SocketNotOpenError(key))) : A3(author$project$WebSocketClient$queueSend, state, key, message);
+		} else {
+			var po = author$project$WebSocketClient$PortMessage$POSend(
+				{key: key, message: message});
+			var _n2 = state.config;
+			var sendPort = _n2.a.sendPort;
+			var simulator = _n2.a.simulator;
+			if (simulator.$ === 'Nothing') {
+				return _Utils_eq(
+					A2(elm$core$Dict$get, key, state.queues),
+					elm$core$Maybe$Nothing) ? _Utils_Tuple2(
+					author$project$WebSocketClient$State(state),
+					author$project$WebSocketClient$CmdResponse(
+						sendPort(
+							author$project$WebSocketClient$PortMessage$encodePortMessage(po)))) : A3(author$project$WebSocketClient$queueSend, state, key, message);
+			} else {
+				var transformer = simulator.a;
+				return _Utils_Tuple2(
+					author$project$WebSocketClient$State(state),
+					function () {
+						var _n4 = transformer(message);
+						if (_n4.$ === 'Just') {
+							var response = _n4.a;
+							return author$project$WebSocketClient$MessageReceivedResponse(
+								{key: key, message: response});
+						} else {
+							return author$project$WebSocketClient$NoResponse;
+						}
+					}());
+			}
+		}
+	});
+var author$project$Main$send = author$project$WebSocketClient$send(author$project$WebSocketClient$PortVersion2);
 var author$project$Main$webSocketClientCmd = _Platform_outgoingPort('webSocketClientCmd', elm$core$Basics$identity);
 var author$project$WebSocketClient$ClosedResponse = function (a) {
 	return {$: 'ClosedResponse', a: a};
 };
 var author$project$WebSocketClient$NormalClosure = {$: 'NormalClosure'};
-var author$project$WebSocketClient$SocketNotOpenError = function (a) {
-	return {$: 'SocketNotOpenError', a: a};
-};
 var author$project$WebSocketClient$PortMessage$POClose = function (a) {
 	return {$: 'POClose', a: a};
 };
-var elm$core$Basics$not = _Basics_not;
 var elm$core$Dict$getMin = function (dict) {
 	getMin:
 	while (true) {
@@ -5824,16 +5970,13 @@ var author$project$WebSocketClient$makeConfig = function (sendPort) {
 	return author$project$WebSocketClient$Config(
 		A2(author$project$WebSocketClient$ConfigRecord, sendPort, elm$core$Maybe$Nothing));
 };
+var author$project$WebSocketClient$AbnormalClosure = {$: 'AbnormalClosure'};
 var author$project$WebSocketClient$InvalidMessageError = function (a) {
 	return {$: 'InvalidMessageError', a: a};
 };
 var author$project$WebSocketClient$LowLevelError = function (a) {
 	return {$: 'LowLevelError', a: a};
 };
-var author$project$WebSocketClient$MessageReceivedResponse = function (a) {
-	return {$: 'MessageReceivedResponse', a: a};
-};
-var author$project$WebSocketClient$NoResponse = {$: 'NoResponse'};
 var author$project$WebSocketClient$PortDecodeError = function (a) {
 	return {$: 'PortDecodeError', a: a};
 };
@@ -5844,7 +5987,6 @@ var author$project$WebSocketClient$UnexpectedMessageError = function (a) {
 	return {$: 'UnexpectedMessageError', a: a};
 };
 var author$project$WebSocketClient$UnknownClosure = {$: 'UnknownClosure'};
-var author$project$WebSocketClient$AbnormalClosure = {$: 'AbnormalClosure'};
 var author$project$WebSocketClient$BadGatewayClosure = {$: 'BadGatewayClosure'};
 var author$project$WebSocketClient$GoingAwayClosure = {$: 'GoingAwayClosure'};
 var author$project$WebSocketClient$InternalErrorClosure = {$: 'InternalErrorClosure'};
@@ -5856,36 +5998,205 @@ var author$project$WebSocketClient$PolicyViolationClosure = {$: 'PolicyViolation
 var author$project$WebSocketClient$ProtocolErrorClosure = {$: 'ProtocolErrorClosure'};
 var author$project$WebSocketClient$ServiceRestartClosure = {$: 'ServiceRestartClosure'};
 var author$project$WebSocketClient$TLSHandshakeClosure = {$: 'TLSHandshakeClosure'};
+var author$project$WebSocketClient$TimedOutOnReconnect = {$: 'TimedOutOnReconnect'};
 var author$project$WebSocketClient$TryAgainLaterClosure = {$: 'TryAgainLaterClosure'};
 var author$project$WebSocketClient$UnsupprtedDataClosure = {$: 'UnsupprtedDataClosure'};
-var author$project$WebSocketClient$closureDict = elm$core$Dict$fromList(
-	_List_fromArray(
-		[
-			_Utils_Tuple2(1000, author$project$WebSocketClient$NormalClosure),
-			_Utils_Tuple2(1001, author$project$WebSocketClient$GoingAwayClosure),
-			_Utils_Tuple2(1002, author$project$WebSocketClient$ProtocolErrorClosure),
-			_Utils_Tuple2(1003, author$project$WebSocketClient$UnsupprtedDataClosure),
-			_Utils_Tuple2(1005, author$project$WebSocketClient$NoStatusRecvdClosure),
-			_Utils_Tuple2(1006, author$project$WebSocketClient$AbnormalClosure),
-			_Utils_Tuple2(1007, author$project$WebSocketClient$InvalidFramePayloadDataClosure),
-			_Utils_Tuple2(1008, author$project$WebSocketClient$PolicyViolationClosure),
-			_Utils_Tuple2(1009, author$project$WebSocketClient$MessageTooBigClosure),
-			_Utils_Tuple2(1010, author$project$WebSocketClient$MissingExtensionClosure),
-			_Utils_Tuple2(1011, author$project$WebSocketClient$InternalErrorClosure),
-			_Utils_Tuple2(1012, author$project$WebSocketClient$ServiceRestartClosure),
-			_Utils_Tuple2(1013, author$project$WebSocketClient$TryAgainLaterClosure),
-			_Utils_Tuple2(1014, author$project$WebSocketClient$BadGatewayClosure),
-			_Utils_Tuple2(1015, author$project$WebSocketClient$TLSHandshakeClosure)
-		]));
+var author$project$WebSocketClient$closurePairs = _List_fromArray(
+	[
+		_Utils_Tuple2(1000, author$project$WebSocketClient$NormalClosure),
+		_Utils_Tuple2(1001, author$project$WebSocketClient$GoingAwayClosure),
+		_Utils_Tuple2(1002, author$project$WebSocketClient$ProtocolErrorClosure),
+		_Utils_Tuple2(1003, author$project$WebSocketClient$UnsupprtedDataClosure),
+		_Utils_Tuple2(1005, author$project$WebSocketClient$NoStatusRecvdClosure),
+		_Utils_Tuple2(1006, author$project$WebSocketClient$AbnormalClosure),
+		_Utils_Tuple2(1007, author$project$WebSocketClient$InvalidFramePayloadDataClosure),
+		_Utils_Tuple2(1008, author$project$WebSocketClient$PolicyViolationClosure),
+		_Utils_Tuple2(1009, author$project$WebSocketClient$MessageTooBigClosure),
+		_Utils_Tuple2(1010, author$project$WebSocketClient$MissingExtensionClosure),
+		_Utils_Tuple2(1011, author$project$WebSocketClient$InternalErrorClosure),
+		_Utils_Tuple2(1012, author$project$WebSocketClient$ServiceRestartClosure),
+		_Utils_Tuple2(1013, author$project$WebSocketClient$TryAgainLaterClosure),
+		_Utils_Tuple2(1014, author$project$WebSocketClient$BadGatewayClosure),
+		_Utils_Tuple2(1015, author$project$WebSocketClient$TLSHandshakeClosure),
+		_Utils_Tuple2(4000, author$project$WebSocketClient$TimedOutOnReconnect)
+	]);
+var author$project$WebSocketClient$closureDict = elm$core$Dict$fromList(author$project$WebSocketClient$closurePairs);
 var author$project$WebSocketClient$closedCode = function (code) {
-	var _n0 = A2(elm$core$Dict$get, code, author$project$WebSocketClient$closureDict);
+	return A2(
+		elm$core$Maybe$withDefault,
+		author$project$WebSocketClient$UnknownClosure,
+		A2(elm$core$Dict$get, code, author$project$WebSocketClient$closureDict));
+};
+var elm_community$list_extra$List$Extra$find = F2(
+	function (predicate, list) {
+		find:
+		while (true) {
+			if (!list.b) {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var first = list.a;
+				var rest = list.b;
+				if (predicate(first)) {
+					return elm$core$Maybe$Just(first);
+				} else {
+					var $temp$predicate = predicate,
+						$temp$list = rest;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue find;
+				}
+			}
+		}
+	});
+var author$project$WebSocketClient$closedCodeNumber = function (code) {
+	var _n0 = A2(
+		elm_community$list_extra$List$Extra$find,
+		function (_n1) {
+			var c = _n1.b;
+			return _Utils_eq(c, code);
+		},
+		author$project$WebSocketClient$closurePairs);
 	if (_n0.$ === 'Just') {
-		var res = _n0.a;
-		return res;
+		var _n2 = _n0.a;
+		var _int = _n2.a;
+		return _int;
 	} else {
-		return author$project$WebSocketClient$UnknownClosure;
+		return 0;
 	}
 };
+var elm$core$Basics$pow = _Basics_pow;
+var author$project$WebSocketClient$backoffMillis = function (backoff) {
+	return 10 * A2(elm$core$Basics$pow, 2, backoff);
+};
+var author$project$WebSocketClient$maxBackoff = 10;
+var author$project$WebSocketClient$unexpectedClose = F2(
+	function (state, _n0) {
+		var key = _n0.key;
+		var code = _n0.code;
+		var reason = _n0.reason;
+		var wasClean = _n0.wasClean;
+		return _Utils_Tuple2(
+			author$project$WebSocketClient$State(
+				_Utils_update(
+					state,
+					{
+						closingSockets: A2(elm$core$Set$remove, key, state.closingSockets),
+						connectingSockets: A2(elm$core$Set$remove, key, state.connectingSockets),
+						openSockets: A2(elm$core$Set$remove, key, state.openSockets),
+						socketUrls: A2(elm$core$Dict$remove, key, state.socketUrls)
+					})),
+			author$project$WebSocketClient$ClosedResponse(
+				{
+					code: author$project$WebSocketClient$closedCode(code),
+					expected: false,
+					key: key,
+					reason: reason,
+					wasClean: wasClean
+				}));
+	});
+var author$project$WebSocketClient$PortMessage$PODelay = function (a) {
+	return {$: 'PODelay', a: a};
+};
+var author$project$WebSocketClient$PortMessage$RetryConnection = function (a) {
+	return {$: 'RetryConnection', a: a};
+};
+var author$project$WebSocketClient$handleUnexpectedClose = F2(
+	function (state, closedRecord) {
+		var key = closedRecord.key;
+		var backoffs = state.socketBackoffs;
+		var backoff = 1 + A2(
+			elm$core$Maybe$withDefault,
+			0,
+			A2(elm$core$Dict$get, key, backoffs));
+		if ((_Utils_cmp(backoff, author$project$WebSocketClient$maxBackoff) > 0) || ((backoff === 1) && (!A2(elm$core$Set$member, key, state.openSockets)))) {
+			return A2(
+				author$project$WebSocketClient$unexpectedClose,
+				state,
+				_Utils_update(
+					closedRecord,
+					{
+						code: (_Utils_cmp(backoff, author$project$WebSocketClient$maxBackoff) > 0) ? author$project$WebSocketClient$closedCodeNumber(author$project$WebSocketClient$TimedOutOnReconnect) : closedRecord.code
+					}));
+		} else {
+			var _n0 = A2(elm$core$Dict$get, key, state.socketUrls);
+			if (_n0.$ === 'Nothing') {
+				return A2(author$project$WebSocketClient$unexpectedClose, state, closedRecord);
+			} else {
+				var delay = author$project$WebSocketClient$PortMessage$encodePortMessage(
+					author$project$WebSocketClient$PortMessage$PODelay(
+						{
+							continuation: author$project$WebSocketClient$PortMessage$RetryConnection(key),
+							millis: author$project$WebSocketClient$backoffMillis(
+								A2(elm$core$Debug$log, 'Backoff', backoff))
+						}));
+				var _n1 = state.config;
+				var sendPort = _n1.a.sendPort;
+				return _Utils_Tuple2(
+					author$project$WebSocketClient$State(
+						_Utils_update(
+							state,
+							{
+								socketBackoffs: A3(elm$core$Dict$insert, key, backoff, backoffs)
+							})),
+					author$project$WebSocketClient$CmdResponse(
+						sendPort(delay)));
+			}
+		}
+	});
+var author$project$WebSocketClient$PortMessage$DrainOutputQueue = function (a) {
+	return {$: 'DrainOutputQueue', a: a};
+};
+var author$project$WebSocketClient$processQueuedMessage = F2(
+	function (state, key) {
+		var queues = state.queues;
+		var _n0 = A2(elm$core$Dict$get, key, queues);
+		if (_n0.$ === 'Nothing') {
+			return _Utils_Tuple2(
+				author$project$WebSocketClient$State(state),
+				author$project$WebSocketClient$NoResponse);
+		} else {
+			if (!_n0.a.b) {
+				return _Utils_Tuple2(
+					author$project$WebSocketClient$State(
+						_Utils_update(
+							state,
+							{
+								queues: A2(elm$core$Dict$remove, key, queues)
+							})),
+					author$project$WebSocketClient$NoResponse);
+			} else {
+				var _n1 = _n0.a;
+				var message = _n1.a;
+				var tail = _n1.b;
+				var posend = author$project$WebSocketClient$PortMessage$POSend(
+					{
+						key: key,
+						message: A2(elm$core$Debug$log, 'Dequeuing:', message)
+					});
+				var podelay = author$project$WebSocketClient$PortMessage$PODelay(
+					{
+						continuation: author$project$WebSocketClient$PortMessage$DrainOutputQueue(key),
+						millis: 20
+					});
+				var _n2 = state.config;
+				var sendPort = _n2.a.sendPort;
+				var cmds = elm$core$Platform$Cmd$batch(
+					A2(
+						elm$core$List$map,
+						A2(elm$core$Basics$composeR, author$project$WebSocketClient$PortMessage$encodePortMessage, sendPort),
+						_List_fromArray(
+							[podelay, posend])));
+				return _Utils_Tuple2(
+					author$project$WebSocketClient$State(
+						_Utils_update(
+							state,
+							{
+								queues: A3(elm$core$Dict$insert, key, tail, queues)
+							})),
+					author$project$WebSocketClient$CmdResponse(cmds));
+			}
+		}
+	});
 var elm$json$Json$Decode$decodeValue = _Json_run;
 var author$project$WebSocketClient$PortMessage$decodeValue = F2(
 	function (decoder, value) {
@@ -5909,11 +6220,54 @@ var author$project$WebSocketClient$PortMessage$PIClosed = function (a) {
 var author$project$WebSocketClient$PortMessage$PIConnected = function (a) {
 	return {$: 'PIConnected', a: a};
 };
+var author$project$WebSocketClient$PortMessage$PIDelayed = function (a) {
+	return {$: 'PIDelayed', a: a};
+};
 var author$project$WebSocketClient$PortMessage$PIError = function (a) {
 	return {$: 'PIError', a: a};
 };
 var author$project$WebSocketClient$PortMessage$PIMessageReceived = function (a) {
 	return {$: 'PIMessageReceived', a: a};
+};
+var elm$json$Json$Decode$andThen = _Json_andThen;
+var elm$json$Json$Decode$fail = _Json_fail;
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$WebSocketClient$PortMessage$continuationDecoder = A2(
+	elm$json$Json$Decode$andThen,
+	function (tag) {
+		switch (tag) {
+			case 'RetryConnection':
+				return A2(
+					elm$json$Json$Decode$map,
+					author$project$WebSocketClient$PortMessage$RetryConnection,
+					A2(elm$json$Json$Decode$field, 'key', elm$json$Json$Decode$string));
+			case 'DrainOutputQueue':
+				return A2(
+					elm$json$Json$Decode$map,
+					author$project$WebSocketClient$PortMessage$DrainOutputQueue,
+					A2(elm$json$Json$Decode$field, 'key', elm$json$Json$Decode$string));
+			default:
+				return elm$json$Json$Decode$fail('Unknown Continuation tag');
+		}
+	},
+	A2(elm$json$Json$Decode$field, 'tag', elm$json$Json$Decode$string));
+var elm$json$Json$Decode$decodeString = _Json_runOnString;
+var author$project$WebSocketClient$PortMessage$decodeString = F2(
+	function (decoder, string) {
+		var _n0 = A2(elm$json$Json$Decode$decodeString, decoder, string);
+		if (_n0.$ === 'Ok') {
+			var a = _n0.a;
+			return elm$core$Result$Ok(a);
+		} else {
+			var err = _n0.a;
+			return elm$core$Result$Err(
+				elm$json$Json$Decode$errorToString(err));
+		}
+	});
+var author$project$WebSocketClient$PortMessage$decodeContinuation = function (json) {
+	return A2(author$project$WebSocketClient$PortMessage$decodeString, author$project$WebSocketClient$PortMessage$continuationDecoder, json);
 };
 var author$project$WebSocketClient$PortMessage$getDictElements = F2(
 	function (keys, dict) {
@@ -5946,15 +6300,6 @@ var author$project$WebSocketClient$PortMessage$getDictElements = F2(
 var elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var elm$core$String$toInt = _String_toInt;
 var author$project$WebSocketClient$PortMessage$fromRawPortMessage = function (_n0) {
 	var tag = _n0.tag;
@@ -6042,17 +6387,37 @@ var author$project$WebSocketClient$PortMessage$fromRawPortMessage = function (_n
 			} else {
 				return author$project$WebSocketClient$PortMessage$InvalidMessage;
 			}
-		case 'error':
+		case 'delayed':
 			var _n17 = A2(
+				author$project$WebSocketClient$PortMessage$getDictElements,
+				_List_fromArray(
+					['continuation']),
+				args);
+			if (((_n17.$ === 'Just') && _n17.a.b) && (!_n17.a.b.b)) {
+				var _n18 = _n17.a;
+				var json = _n18.a;
+				var _n19 = author$project$WebSocketClient$PortMessage$decodeContinuation(json);
+				if (_n19.$ === 'Err') {
+					return author$project$WebSocketClient$PortMessage$InvalidMessage;
+				} else {
+					var continuation = _n19.a;
+					return author$project$WebSocketClient$PortMessage$PIDelayed(
+						{continuation: continuation});
+				}
+			} else {
+				return author$project$WebSocketClient$PortMessage$InvalidMessage;
+			}
+		case 'error':
+			var _n20 = A2(
 				author$project$WebSocketClient$PortMessage$getDictElements,
 				_List_fromArray(
 					['code', 'description']),
 				args);
-			if ((((_n17.$ === 'Just') && _n17.a.b) && _n17.a.b.b) && (!_n17.a.b.b.b)) {
-				var _n18 = _n17.a;
-				var code = _n18.a;
-				var _n19 = _n18.b;
-				var description = _n19.a;
+			if ((((_n20.$ === 'Just') && _n20.a.b) && _n20.a.b.b) && (!_n20.a.b.b.b)) {
+				var _n21 = _n20.a;
+				var code = _n21.a;
+				var _n22 = _n21.b;
+				var description = _n22.a;
 				return author$project$WebSocketClient$PortMessage$PIError(
 					{
 						code: code,
@@ -6068,16 +6433,13 @@ var author$project$WebSocketClient$PortMessage$fromRawPortMessage = function (_n
 	}
 };
 var elm$json$Json$Decode$keyValuePairs = _Json_decodeKeyValuePairs;
-var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$dict = function (decoder) {
 	return A2(
 		elm$json$Json$Decode$map,
 		elm$core$Dict$fromList,
 		elm$json$Json$Decode$keyValuePairs(decoder));
 };
-var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$WebSocketClient$PortMessage$rawPortMessageDecoder = A3(
 	elm$json$Json$Decode$map2,
 	author$project$WebSocketClient$PortMessage$RawPortMessage,
@@ -6110,20 +6472,27 @@ var author$project$WebSocketClient$process = F2(
 				case 'PIConnected':
 					var key = pi.a.key;
 					var description = pi.a.description;
-					return (!A2(elm$core$Set$member, key, connectingSockets)) ? _Utils_Tuple2(
-						author$project$WebSocketClient$State(state),
-						author$project$WebSocketClient$ErrorResponse(
-							author$project$WebSocketClient$UnexpectedConnectedError(
-								{description: description, key: key}))) : _Utils_Tuple2(
-						author$project$WebSocketClient$State(
-							_Utils_update(
-								state,
-								{
-									connectingSockets: A2(elm$core$Set$remove, key, connectingSockets),
-									openSockets: A2(elm$core$Set$insert, key, openSockets)
-								})),
-						author$project$WebSocketClient$ConnectedResponse(
-							{description: description, key: key}));
+					if (!A2(elm$core$Set$member, key, connectingSockets)) {
+						return _Utils_Tuple2(
+							author$project$WebSocketClient$State(state),
+							author$project$WebSocketClient$ErrorResponse(
+								author$project$WebSocketClient$UnexpectedConnectedError(
+									{description: description, key: key})));
+					} else {
+						var backoffs = state.socketBackoffs;
+						var maybeBackoff = A2(elm$core$Dict$get, key, backoffs);
+						var newState = _Utils_update(
+							state,
+							{
+								connectingSockets: A2(elm$core$Set$remove, key, connectingSockets),
+								openSockets: A2(elm$core$Set$insert, key, openSockets),
+								socketBackoffs: A2(elm$core$Dict$remove, key, backoffs)
+							});
+						return _Utils_eq(maybeBackoff, elm$core$Maybe$Nothing) ? _Utils_Tuple2(
+							author$project$WebSocketClient$State(newState),
+							author$project$WebSocketClient$ConnectedResponse(
+								{description: description, key: key})) : A2(author$project$WebSocketClient$processQueuedMessage, newState, key);
+					}
 				case 'PIMessageReceived':
 					var key = pi.a.key;
 					var message = pi.a.message;
@@ -6136,32 +6505,18 @@ var author$project$WebSocketClient$process = F2(
 						author$project$WebSocketClient$MessageReceivedResponse(
 							{key: key, message: message}));
 				case 'PIClosed':
-					var key = pi.a.key;
-					var code = pi.a.code;
-					var reason = pi.a.reason;
-					var wasClean = pi.a.wasClean;
-					return (!A2(elm$core$Set$member, key, closingSockets)) ? _Utils_Tuple2(
+					var closedRecord = pi.a;
+					var key = closedRecord.key;
+					var code = closedRecord.code;
+					var reason = closedRecord.reason;
+					var wasClean = closedRecord.wasClean;
+					return (!A2(elm$core$Set$member, key, closingSockets)) ? A2(author$project$WebSocketClient$handleUnexpectedClose, state, closedRecord) : _Utils_Tuple2(
 						author$project$WebSocketClient$State(
 							_Utils_update(
 								state,
 								{
 									closingSockets: A2(elm$core$Set$remove, key, closingSockets),
-									connectingSockets: A2(elm$core$Set$remove, key, connectingSockets),
-									openSockets: A2(elm$core$Set$remove, key, openSockets)
-								})),
-						author$project$WebSocketClient$ClosedResponse(
-							{
-								code: author$project$WebSocketClient$closedCode(code),
-								expected: false,
-								key: key,
-								reason: reason,
-								wasClean: wasClean
-							})) : _Utils_Tuple2(
-						author$project$WebSocketClient$State(
-							_Utils_update(
-								state,
-								{
-									closingSockets: A2(elm$core$Set$remove, key, closingSockets)
+									socketUrls: A2(elm$core$Dict$remove, key, state.socketUrls)
 								})),
 						author$project$WebSocketClient$ClosedResponse(
 							{
@@ -6177,6 +6532,40 @@ var author$project$WebSocketClient$process = F2(
 					return _Utils_Tuple2(
 						author$project$WebSocketClient$State(state),
 						author$project$WebSocketClient$NoResponse);
+				case 'PIDelayed':
+					var continuation = pi.a.continuation;
+					if (continuation.$ === 'RetryConnection') {
+						var key = continuation.a;
+						var _n4 = A2(elm$core$Dict$get, key, state.socketUrls);
+						if (_n4.$ === 'Just') {
+							var url = _n4.a;
+							return A3(
+								author$project$WebSocketClient$openWithKeyInternal,
+								author$project$WebSocketClient$State(
+									_Utils_update(
+										state,
+										{
+											connectingSockets: A2(elm$core$Set$remove, key, connectingSockets),
+											openSockets: A2(elm$core$Set$remove, key, openSockets)
+										})),
+								key,
+								url);
+						} else {
+							return A2(
+								author$project$WebSocketClient$unexpectedClose,
+								state,
+								{
+									code: author$project$WebSocketClient$closedCodeNumber(author$project$WebSocketClient$AbnormalClosure),
+									key: key,
+									reason: 'Missing URL for reconnect',
+									wasClean: false
+								});
+						}
+					} else {
+						var key = continuation.a;
+						var queues = state.queues;
+						return A2(author$project$WebSocketClient$processQueuedMessage, state, key);
+					}
 				case 'PIError':
 					var key = pi.a.key;
 					var code = pi.a.code;
@@ -6198,59 +6587,15 @@ var author$project$WebSocketClient$process = F2(
 			}
 		}
 	});
-var author$project$WebSocketClient$PortMessage$POSend = function (a) {
-	return {$: 'POSend', a: a};
-};
-var author$project$WebSocketClient$sendWithKey = F4(
-	function (_n0, key, url, message) {
-		var state = _n0.a;
-		if (!A2(elm$core$Set$member, key, state.openSockets)) {
-			return _Utils_Tuple2(
-				author$project$WebSocketClient$State(state),
-				author$project$WebSocketClient$ErrorResponse(
-					author$project$WebSocketClient$SocketNotOpenError(key)));
-		} else {
-			var po = author$project$WebSocketClient$PortMessage$POSend(
-				{key: key, message: message});
-			var _n1 = state.config;
-			var sendPort = _n1.a.sendPort;
-			var simulator = _n1.a.simulator;
-			if (simulator.$ === 'Nothing') {
-				return _Utils_Tuple2(
-					author$project$WebSocketClient$State(state),
-					author$project$WebSocketClient$CmdResponse(
-						sendPort(
-							author$project$WebSocketClient$PortMessage$encodePortMessage(po))));
-			} else {
-				var transformer = simulator.a;
-				return _Utils_Tuple2(
-					author$project$WebSocketClient$State(state),
-					function () {
-						var _n3 = transformer(message);
-						if (_n3.$ === 'Just') {
-							var response = _n3.a;
-							return author$project$WebSocketClient$MessageReceivedResponse(
-								{key: key, message: response});
-						} else {
-							return author$project$WebSocketClient$NoResponse;
-						}
-					}());
-			}
-		}
-	});
-var author$project$WebSocketClient$send = F3(
-	function (state, url, message) {
-		return A4(author$project$WebSocketClient$sendWithKey, state, url, url, message);
-	});
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'UpdateSend':
-				var send = msg.a;
+				var newsend = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{send: send}),
+						{send: newsend}),
 					elm$core$Platform$Cmd$none);
 			case 'UpdateUrl':
 				var url = msg.a;
@@ -6285,7 +6630,7 @@ var author$project$Main$update = F2(
 						{
 							log: A2(elm$core$List$cons, 'Sending \"' + (model.send + '\"'), model.log)
 						}),
-					A3(author$project$WebSocketClient$send, model.state, model.key, model.send));
+					A3(author$project$Main$send, model.state, model.key, model.send));
 			case 'Receive':
 				var value = msg.a;
 				return A2(
@@ -6352,14 +6697,6 @@ var author$project$Main$docp = function (string) {
 			]));
 };
 var elm$core$Basics$neq = _Utils_notEqual;
-var elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
-		}
-	});
 var elm$core$List$concat = function (lists) {
 	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
 };
