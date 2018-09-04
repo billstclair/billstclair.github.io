@@ -4834,7 +4834,7 @@ var author$project$WebSocketClient$SocketConnectingError = function (a) {
 	return {$: 'SocketConnectingError', a: a};
 };
 var author$project$WebSocketClient$IdlePhase = {$: 'IdlePhase'};
-var author$project$WebSocketClient$emptySocketState = {backoff: 0, continuationId: elm$core$Maybe$Nothing, phase: author$project$WebSocketClient$IdlePhase, url: ''};
+var author$project$WebSocketClient$emptySocketState = {backoff: 0, continuationId: elm$core$Maybe$Nothing, keepalive: false, phase: author$project$WebSocketClient$IdlePhase, url: ''};
 var elm$core$Basics$compare = _Utils_compare;
 var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
@@ -6504,7 +6504,7 @@ var author$project$WebSocketClient$process = F2(
 							author$project$WebSocketClient$UnexpectedMessageError(
 								{key: key, message: message}))) : _Utils_Tuple2(
 						author$project$WebSocketClient$State(state),
-						author$project$WebSocketClient$MessageReceivedResponse(
+						socketState.keepalive ? author$project$WebSocketClient$NoResponse : author$project$WebSocketClient$MessageReceivedResponse(
 							{key: key, message: message}));
 				case 'PIClosed':
 					var closedRecord = pi.a;
