@@ -134,6 +134,7 @@ function doOpen(args) {
     delete sockets[key];        // for open errors
     returnPort.send(objectReturn("closed",
                                  { key: key,
+                                   bytesQueued: "" + socket.bufferedAmount,
                                    code: "" + event.code,
                                    reason: "" + event.reason,
                                    wasClean: event.wasClean ? "true" : "false"
@@ -195,12 +196,9 @@ function doBytesQueued(args) {
 function doDelay(args) {
   var key = args.key;
   var millis = args.millis;
-  console.log("Sleeping for", millis, " milliseconds");
-  console.log("  then:", args.continuation);
+  console.log("Sleeping for", millis, " milliseconds for id: ", args.id);
   function callback() {
-    returnPort.send(objectReturn("delayed",
-                                 { continuation : args.continuation
-                                 }));
+    returnPort.send(objectReturn("delayed", {id: args.id}));
   }
   setTimeout(callback, millis);
 } 
