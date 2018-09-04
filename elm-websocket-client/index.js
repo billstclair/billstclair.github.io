@@ -5280,8 +5280,8 @@ var author$project$WebSocketClient$closedCodeToString = function (code) {
 			return 'GoingAway';
 		case 'ProtocolErrorClosure':
 			return 'ProtocolError';
-		case 'UnsupprtedDataClosure':
-			return 'UnsupprtedData';
+		case 'UnsupportedDataClosure':
+			return 'UnsupportedData';
 		case 'NoStatusRecvdClosure':
 			return 'NoStatusRecvd';
 		case 'AbnormalClosure':
@@ -5443,7 +5443,6 @@ var author$project$WebSocketClient$NoResponse = {$: 'NoResponse'};
 var author$project$WebSocketClient$SocketNotOpenError = function (a) {
 	return {$: 'SocketNotOpenError', a: a};
 };
-var elm$core$Debug$log = _Debug_log;
 var elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5463,9 +5462,7 @@ var author$project$WebSocketClient$queueSend = F3(
 			elm$core$List$append,
 			current,
 			_List_fromArray(
-				[
-					A2(elm$core$Debug$log, 'Queueing:', message)
-				]));
+				[message]));
 		return _Utils_Tuple2(
 			author$project$WebSocketClient$State(
 				_Utils_update(
@@ -5983,13 +5980,13 @@ var author$project$WebSocketClient$ServiceRestartClosure = {$: 'ServiceRestartCl
 var author$project$WebSocketClient$TLSHandshakeClosure = {$: 'TLSHandshakeClosure'};
 var author$project$WebSocketClient$TimedOutOnReconnect = {$: 'TimedOutOnReconnect'};
 var author$project$WebSocketClient$TryAgainLaterClosure = {$: 'TryAgainLaterClosure'};
-var author$project$WebSocketClient$UnsupprtedDataClosure = {$: 'UnsupprtedDataClosure'};
+var author$project$WebSocketClient$UnsupportedDataClosure = {$: 'UnsupportedDataClosure'};
 var author$project$WebSocketClient$closurePairs = _List_fromArray(
 	[
 		_Utils_Tuple2(1000, author$project$WebSocketClient$NormalClosure),
 		_Utils_Tuple2(1001, author$project$WebSocketClient$GoingAwayClosure),
 		_Utils_Tuple2(1002, author$project$WebSocketClient$ProtocolErrorClosure),
-		_Utils_Tuple2(1003, author$project$WebSocketClient$UnsupprtedDataClosure),
+		_Utils_Tuple2(1003, author$project$WebSocketClient$UnsupportedDataClosure),
 		_Utils_Tuple2(1005, author$project$WebSocketClient$NoStatusRecvdClosure),
 		_Utils_Tuple2(1006, author$project$WebSocketClient$AbnormalClosure),
 		_Utils_Tuple2(1007, author$project$WebSocketClient$InvalidFramePayloadDataClosure),
@@ -6167,8 +6164,7 @@ var author$project$WebSocketClient$handleUnexpectedClose = F2(
 					author$project$WebSocketClient$PortMessage$PODelay(
 						{
 							id: id,
-							millis: author$project$WebSocketClient$backoffMillis(
-								A2(elm$core$Debug$log, 'Backoff', backoff))
+							millis: author$project$WebSocketClient$backoffMillis(backoff)
 						}));
 				var _n1 = state2.config;
 				var sendPort = _n1.a.sendPort;
@@ -6214,10 +6210,7 @@ var author$project$WebSocketClient$processQueuedMessage = F2(
 				var message = _n1.a;
 				var tail = _n1.b;
 				var posend = author$project$WebSocketClient$PortMessage$POSend(
-					{
-						key: key,
-						message: A2(elm$core$Debug$log, 'Dequeuing:', message)
-					});
+					{key: key, message: message});
 				var _n2 = A3(author$project$WebSocketClient$allocateContinuation, key, author$project$WebSocketClient$DrainOutputQueue, state);
 				var id = _n2.a;
 				var state2 = _n2.b;
