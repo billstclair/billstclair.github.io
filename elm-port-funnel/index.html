@@ -1,0 +1,43 @@
+<!--------------------------------------------------------------------
+--
+-- index.html
+-- PortFunnel Top Level HTML
+-- Copyright (c) 2018 Bill St. Clair <billstclair@gmail.com>
+-- Some rights reserved.
+-- Distributed under the MIT License
+-- See LICENSE
+--
+---------------------------------------------------------------------->
+
+<html>
+  <head>
+    <title>PortFunnel Example</title>
+    <!-- Compile your Elm application into index.js. E.g.:
+      -- elm make src/Main.elm --output site/index.js
+      -->
+    <script type='text/javascript' src='index.js'></script>
+    <script type='text/javascript' src='js/PortFunnel.js'></script>
+  </head>
+  <body>
+    <div id='elm'></div>
+    <script type='text/javascript'>
+
+// Initialize the name of your main module here
+// Change "Main" to your application's module name.
+var mainModule = 'Main';
+
+var app = Elm[mainModule].init({
+  node: document.getElementById('elm'),
+});
+
+// This is the default, so you don't need to pass it.
+var portnames = ['cmdPort', 'subPort'];
+
+// PortFunnel.subscribe will load js/PortFunnel/<module>.js,
+// for each module in this list.
+var modules = ['Echo', 'AddXY'];
+
+PortFunnel.subscribe(app, {modules: modules});
+    </script>
+  </body>
+</html>
