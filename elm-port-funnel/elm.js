@@ -12557,6 +12557,9 @@ var author$project$Main$view = function (model) {
 						])),
 					author$project$Main$p(
 					_List_fromArray(
+						['If the \'Use Simulator\' checkbox is checked, a local pure Elm\'', ' simulator will be used. If it is NOT checked, then the', ' real ports will be used, and if they aren\'t hooked up', ' properly, nothing will happen.', ' If \'Use Simulator\' is checked at startup, then the', ' Echo module\'s JavaScript backend didn\'t successfully', ' initialize (or you\'re running the code from', ' \'example/Main.elm\', in \'elm reactor\', instead of from', ' \'example/site/index.html\'.'])),
+					author$project$Main$p(
+					_List_fromArray(
 						['Fill in the two numbers and click \'Add\' to add them together,', ' or \'Multiply\' to multiply them.', ' The AddXY port code will do it a second time,', ' with incremented numbers, a second later.'])),
 					author$project$Main$p(
 					_List_fromArray(
