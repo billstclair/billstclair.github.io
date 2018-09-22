@@ -4964,7 +4964,7 @@ var author$project$PortFunnel$Echo$moduleDesc = A4(author$project$PortFunnel$mak
 var author$project$PortFunnel$Echo$send = author$project$PortFunnel$sendMessage(author$project$PortFunnel$Echo$moduleDesc);
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{echo: 'foo', echoed: _List_Nil, error: elm$core$Maybe$Nothing, state: author$project$Main$initialState, sums: _List_Nil, useSimulator: true, x: '2', y: '3'},
+		{echo: 'foo', echoed: _List_Nil, error: elm$core$Maybe$Nothing, state: author$project$Main$initialState, sums: _List_Nil, useSimulator: true, wasLoaded: false, x: '2', y: '3'},
 		A2(
 			author$project$PortFunnel$Echo$send,
 			author$project$Main$cmdPort,
@@ -5406,6 +5406,73 @@ var author$project$Main$simulatedEchoCmdPort = author$project$PortFunnel$Echo$ma
 var author$project$Main$getEchoCmdPort = function (model) {
 	return model.useSimulator ? author$project$Main$simulatedEchoCmdPort : author$project$Main$cmdPort;
 };
+var author$project$Main$getGMCmdPort = F2(
+	function (genericMessage, model) {
+		var moduleName = genericMessage.moduleName;
+		return _Utils_eq(moduleName, author$project$PortFunnel$Echo$moduleName) ? author$project$Main$getEchoCmdPort(model) : author$project$Main$getAddXYCmdPort(model);
+	});
+var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
+	function (cmds, model) {
+		return _Utils_Tuple2(
+			model,
+			elm$core$Platform$Cmd$batch(cmds));
+	});
+var author$project$PortFunnel$process = F4(
+	function (accessors, _n0, genericMessage, state) {
+		var moduleDesc = _n0.a;
+		var _n1 = moduleDesc.decoder(genericMessage);
+		if (_n1.$ === 'Err') {
+			var err = _n1.a;
+			return elm$core$Result$Err(err);
+		} else {
+			var message = _n1.a;
+			var substate = accessors.get(state);
+			var _n2 = A2(moduleDesc.process, message, substate);
+			var substate2 = _n2.a;
+			var response = _n2.b;
+			return elm$core$Result$Ok(
+				_Utils_Tuple2(
+					A2(accessors.set, substate2, state),
+					response));
+		}
+	});
+var author$project$PortFunnel$appProcess = F5(
+	function (cmdPort, genericMessage, funnel, state, model) {
+		var _n0 = A4(author$project$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
+		if (_n0.$ === 'Err') {
+			var error = _n0.a;
+			return elm$core$Result$Err(error);
+		} else {
+			var _n1 = _n0.a;
+			var state2 = _n1.a;
+			var response = _n1.b;
+			var gmToCmdPort = function (gm) {
+				return cmdPort(
+					author$project$PortFunnel$encodeGenericMessage(gm));
+			};
+			var cmd = A2(funnel.commander, gmToCmdPort, response);
+			var _n2 = A3(funnel.handler, response, state2, model);
+			var model2 = _n2.a;
+			var cmd2 = _n2.b;
+			return elm$core$Result$Ok(
+				A2(
+					Janiczek$cmd_extra$Cmd$Extra$withCmds,
+					_List_fromArray(
+						[cmd, cmd2]),
+					model2));
+		}
+	});
+var author$project$Main$appTrampoline = F4(
+	function (genericMessage, funnel, state, model) {
+		var gmPort = A2(author$project$Main$getGMCmdPort, genericMessage, model);
+		if (funnel.$ === 'EchoFunnel') {
+			var echoFunnel = funnel.a;
+			return A5(author$project$PortFunnel$appProcess, author$project$Main$cmdPort, genericMessage, echoFunnel, state, model);
+		} else {
+			var addFunnel = funnel.a;
+			return A5(author$project$PortFunnel$appProcess, author$project$Main$cmdPort, genericMessage, addFunnel, state, model);
+		}
+	});
 var author$project$Main$AddXYFunnel = function (a) {
 	return {$: 'AddXYFunnel', a: a};
 };
@@ -5481,6 +5548,16 @@ var author$project$Main$echoAccessors = A2(
 				state,
 				{echo: substate});
 		}));
+var author$project$PortFunnel$Echo$isLoaded = function (_n0) {
+	var state = _n0.a;
+	return state.isLoaded;
+};
+var elm$core$Basics$not = _Basics_not;
+var author$project$Main$doIsLoaded = function (model) {
+	return ((!model.wasLoaded) && author$project$PortFunnel$Echo$isLoaded(model.state.echo)) ? _Utils_update(
+		model,
+		{useSimulator: false, wasLoaded: true}) : model;
+};
 var elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5524,7 +5601,8 @@ var elm$core$List$concat = function (lists) {
 };
 var author$project$Main$echoHandler = F3(
 	function (response, state, model) {
-		return _Utils_Tuple2(
+		var wasLoaded = model.wasLoaded;
+		var model2 = author$project$Main$doIsLoaded(
 			_Utils_update(
 				model,
 				{
@@ -5552,8 +5630,12 @@ var author$project$Main$echoHandler = F3(
 						}
 					}(),
 					state: state
-				}),
-			elm$core$Platform$Cmd$none);
+				}));
+		var cmd = (wasLoaded || (!model2.wasLoaded)) ? elm$core$Platform$Cmd$none : A2(
+			author$project$PortFunnel$Echo$send,
+			author$project$Main$cmdPort,
+			author$project$PortFunnel$Echo$makeMessage('This should happen second.'));
+		return _Utils_Tuple2(model2, cmd);
 	});
 var author$project$PortFunnel$FunnelSpec = F4(
 	function (accessors, moduleDesc, commander, handler) {
@@ -5725,120 +5807,22 @@ var author$project$Main$funnels = elm$core$Dict$fromList(
 			author$project$Main$AddXYFunnel(
 				A4(author$project$PortFunnel$FunnelSpec, author$project$Main$addxyAccessors, author$project$PortFunnel$AddXY$moduleDesc, author$project$PortFunnel$AddXY$commander, author$project$Main$addXYHandler)))
 		]));
-var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
-	function (cmds, model) {
-		return _Utils_Tuple2(
-			model,
-			elm$core$Platform$Cmd$batch(cmds));
-	});
-var author$project$Main$getGMCmdPort = F2(
-	function (genericMessage, model) {
-		var moduleName = genericMessage.moduleName;
-		return _Utils_eq(moduleName, author$project$PortFunnel$Echo$moduleName) ? author$project$Main$getEchoCmdPort(model) : author$project$Main$getAddXYCmdPort(model);
-	});
-var author$project$PortFunnel$genericMessageToCmdPort = F2(
-	function (cmdPort, genericMessage) {
-		return cmdPort(
-			author$project$PortFunnel$encodeGenericMessage(genericMessage));
-	});
-var author$project$PortFunnel$process = F4(
-	function (accessors, _n0, genericMessage, state) {
-		var moduleDesc = _n0.a;
-		var _n1 = moduleDesc.decoder(genericMessage);
-		if (_n1.$ === 'Err') {
-			var err = _n1.a;
-			return elm$core$Result$Err(err);
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
 		} else {
-			var message = _n1.a;
-			var substate = accessors.get(state);
-			var _n2 = A2(moduleDesc.process, message, substate);
-			var substate2 = _n2.a;
-			var response = _n2.b;
-			return elm$core$Result$Ok(
-				_Utils_Tuple2(
-					A2(accessors.set, substate2, state),
-					response));
+			return _default;
 		}
 	});
-var author$project$PortFunnel$appProcess = F5(
-	function (cmdPort, genericMessage, funnel, state, model) {
-		var _n0 = A4(author$project$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
-		if (_n0.$ === 'Err') {
-			var error = _n0.a;
-			return elm$core$Result$Err(error);
-		} else {
-			var _n1 = _n0.a;
-			var state2 = _n1.a;
-			var response = _n1.b;
-			var cmd = A2(
-				funnel.commander,
-				author$project$PortFunnel$genericMessageToCmdPort(cmdPort),
-				response);
-			var _n2 = A3(funnel.handler, response, state2, model);
-			var model2 = _n2.a;
-			var cmd2 = _n2.b;
-			return elm$core$Result$Ok(
-				A2(
-					Janiczek$cmd_extra$Cmd$Extra$withCmds,
-					_List_fromArray(
-						[cmd, cmd2]),
-					model2));
-		}
-	});
-var author$project$Main$process = F3(
-	function (genericMessage, funnel, model) {
-		var _n0 = A5(
-			author$project$PortFunnel$appProcess,
-			A2(author$project$Main$getGMCmdPort, genericMessage, model),
-			genericMessage,
-			funnel,
-			model.state,
-			model);
-		if (_n0.$ === 'Err') {
-			var error = _n0.a;
-			return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-				_Utils_update(
-					model,
-					{
-						error: elm$core$Maybe$Just(error)
-					}));
-		} else {
-			var _n1 = _n0.a;
-			var model2 = _n1.a;
-			var cmd = _n1.b;
-			return _Utils_Tuple2(model2, cmd);
-		}
-	});
-var author$project$PortFunnel$Echo$isLoaded = function (_n0) {
-	var state = _n0.a;
-	return state.isLoaded;
-};
-var elm$core$Basics$not = _Basics_not;
-var author$project$Main$processFunnel = F3(
-	function (genericMessage, funnel, model) {
-		if (funnel.$ === 'EchoFunnel') {
-			var appFunnel = funnel.a;
-			var wasLoaded = author$project$PortFunnel$Echo$isLoaded(model.state.echo);
-			var _n1 = A3(author$project$Main$process, genericMessage, appFunnel, model);
-			var mdl = _n1.a;
-			var cmd = _n1.b;
-			return ((!wasLoaded) && author$project$PortFunnel$Echo$isLoaded(mdl.state.echo)) ? A2(
-				Janiczek$cmd_extra$Cmd$Extra$withCmds,
-				_List_fromArray(
-					[
-						cmd,
-						A2(
-						author$project$PortFunnel$Echo$send,
-						author$project$Main$cmdPort,
-						author$project$PortFunnel$Echo$makeMessage('This should happen second.'))
-					]),
-				_Utils_update(
-					mdl,
-					{useSimulator: false})) : A2(Janiczek$cmd_extra$Cmd$Extra$withCmd, cmd, mdl);
-		} else {
-			var appFunnel = funnel.a;
-			return A3(author$project$Main$process, genericMessage, appFunnel, model);
-		}
+var elm$core$String$toInt = _String_toInt;
+var author$project$Main$toInt = F2(
+	function (_default, string) {
+		return A2(
+			elm$core$Maybe$withDefault,
+			_default,
+			elm$core$String$toInt(string));
 	});
 var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
@@ -5871,50 +5855,33 @@ var elm$core$Dict$get = F2(
 			}
 		}
 	});
-var author$project$Main$processValue = F2(
-	function (value, model) {
+var author$project$PortFunnel$processValue = F5(
+	function (funnels, appTrampoline, value, state, model) {
 		var _n0 = author$project$PortFunnel$decodeGenericMessage(value);
 		if (_n0.$ === 'Err') {
 			var error = _n0.a;
-			return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-				_Utils_update(
-					model,
-					{
-						error: elm$core$Maybe$Just(error)
-					}));
+			return elm$core$Result$Err(error);
 		} else {
 			var genericMessage = _n0.a;
 			var moduleName = genericMessage.moduleName;
-			var _n1 = A2(elm$core$Dict$get, moduleName, author$project$Main$funnels);
-			if (_n1.$ === 'Nothing') {
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-					_Utils_update(
-						model,
-						{
-							error: elm$core$Maybe$Just('Unknown moduleName: ' + moduleName)
-						}));
-			} else {
+			var _n1 = A2(elm$core$Dict$get, moduleName, funnels);
+			if (_n1.$ === 'Just') {
 				var funnel = _n1.a;
-				return A3(author$project$Main$processFunnel, genericMessage, funnel, model);
+				var _n2 = A4(appTrampoline, genericMessage, funnel, state, model);
+				if (_n2.$ === 'Err') {
+					var error = _n2.a;
+					return elm$core$Result$Err(error);
+				} else {
+					var _n3 = _n2.a;
+					var model2 = _n3.a;
+					var cmd = _n3.b;
+					return elm$core$Result$Ok(
+						_Utils_Tuple2(model2, cmd));
+				}
+			} else {
+				return elm$core$Result$Err('Unknown moduleName: ' + moduleName);
 			}
 		}
-	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var elm$core$String$toInt = _String_toInt;
-var author$project$Main$toInt = F2(
-	function (_default, string) {
-		return A2(
-			elm$core$Maybe$withDefault,
-			_default,
-			elm$core$String$toInt(string));
 	});
 var author$project$PortFunnel$AddXY$makeAddMessage = F2(
 	function (x, y) {
@@ -5932,7 +5899,20 @@ var author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'Process':
 				var value = msg.a;
-				return A2(author$project$Main$processValue, value, model);
+				var _n1 = A5(author$project$PortFunnel$processValue, author$project$Main$funnels, author$project$Main$appTrampoline, value, model.state, model);
+				if (_n1.$ === 'Err') {
+					var error = _n1.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: elm$core$Maybe$Just(error)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					var res = _n1.a;
+					return res;
+				}
 			case 'SetUseSimulator':
 				var useSimulator = msg.a;
 				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
