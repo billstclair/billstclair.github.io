@@ -4783,7 +4783,7 @@ var author$project$PortFunnel$WebSocket$initialState = author$project$PortFunnel
 var author$project$Main$initialFunnelState = {socket: author$project$PortFunnel$WebSocket$initialState};
 var author$project$Main$init = function (_n0) {
 	return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-		{error: elm$core$Maybe$Nothing, funnelState: author$project$Main$initialFunnelState, key: 'socket', log: _List_Nil, send: 'Hello World!', url: author$project$Main$defaultUrl, useSimulator: true, wasLoaded: false});
+		{error: elm$core$Maybe$Nothing, key: 'socket', log: _List_Nil, send: 'Hello World!', state: author$project$Main$initialFunnelState, url: author$project$Main$defaultUrl, useSimulator: true, wasLoaded: false});
 };
 var author$project$Main$Process = function (a) {
 	return {$: 'Process', a: a};
@@ -4797,655 +4797,7 @@ var Janiczek$cmd_extra$Cmd$Extra$withCmd = F2(
 	function (cmd, model) {
 		return _Utils_Tuple2(model, cmd);
 	});
-var author$project$Main$SocketFunnel = function (a) {
-	return {$: 'SocketFunnel', a: a};
-};
-var billstclair$elm_port_funnel$PortFunnel$StateAccessors = F2(
-	function (get, set) {
-		return {get: get, set: set};
-	});
-var author$project$Main$socketAccessors = A2(
-	billstclair$elm_port_funnel$PortFunnel$StateAccessors,
-	function ($) {
-		return $.socket;
-	},
-	F2(
-		function (substate, state) {
-			return _Utils_update(
-				state,
-				{socket: substate});
-		}));
-var author$project$PortFunnel$WebSocket$closedCodeToString = function (code) {
-	switch (code.$) {
-		case 'NormalClosure':
-			return 'Normal';
-		case 'GoingAwayClosure':
-			return 'GoingAway';
-		case 'ProtocolErrorClosure':
-			return 'ProtocolError';
-		case 'UnsupportedDataClosure':
-			return 'UnsupportedData';
-		case 'NoStatusRecvdClosure':
-			return 'NoStatusRecvd';
-		case 'AbnormalClosure':
-			return 'Abnormal';
-		case 'InvalidFramePayloadDataClosure':
-			return 'InvalidFramePayloadData';
-		case 'PolicyViolationClosure':
-			return 'PolicyViolation';
-		case 'MessageTooBigClosure':
-			return 'MessageTooBig';
-		case 'MissingExtensionClosure':
-			return 'MissingExtension';
-		case 'InternalErrorClosure':
-			return 'InternalError';
-		case 'ServiceRestartClosure':
-			return 'ServiceRestart';
-		case 'TryAgainLaterClosure':
-			return 'TryAgainLater';
-		case 'BadGatewayClosure':
-			return 'BadGateway';
-		case 'TLSHandshakeClosure':
-			return 'TLSHandshake';
-		case 'TimedOutOnReconnect':
-			return 'TimedOutOnReconnect';
-		default:
-			return 'UnknownClosureCode';
-	}
-};
-var author$project$Main$closedString = F3(
-	function (code, wasClean, expected) {
-		return 'code: ' + (author$project$PortFunnel$WebSocket$closedCodeToString(code) + (', ' + ((wasClean ? 'clean' : 'not clean') + (', ' + (expected ? 'expected' : 'NOT expected')))));
-	});
-var author$project$PortFunnel$WebSocket$maybeStringToString = function (string) {
-	if (string.$ === 'Nothing') {
-		return 'Nothing';
-	} else {
-		var s = string.a;
-		return 'Just \"' + (s + '\"');
-	}
-};
-var author$project$PortFunnel$WebSocket$maybeString = function (s) {
-	if (s.$ === 'Nothing') {
-		return 'Nothing';
-	} else {
-		var string = s.a;
-		return 'Just ' + string;
-	}
-};
-var author$project$PortFunnel$WebSocket$toString = function (mess) {
-	switch (mess.$) {
-		case 'Startup':
-			return '<Startup>';
-		case 'PWillOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
-			var keepAlive = mess.a.keepAlive;
-			return 'PWillOpen { key = \"' + (key + ('\", url = \"' + (url + ('\", keepAlive = ' + (keepAlive ? 'True' : ('False' + '}'))))));
-		case 'POOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
-			return 'POOpen { key = \"' + (key + ('\", url = \"' + (url + '\"}')));
-		case 'PIConnected':
-			var key = mess.a.key;
-			var description = mess.a.description;
-			return 'PIConnected { key = \"' + (key + ('\", description = \"' + (description + '\"}')));
-		case 'PWillSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
-			return 'PWillSend { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
-		case 'POSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
-			return 'POSend { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
-		case 'PIMessageReceived':
-			var key = mess.a.key;
-			var message = mess.a.message;
-			return 'PIMessageReceived { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
-		case 'PWillClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
-			return 'PWillClose { key = \"' + (key + ('\", reason = \"' + (reason + '\"}')));
-		case 'POClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
-			return 'POClose { key = \"' + (key + ('\", reason = \"' + (reason + '\"}')));
-		case 'PIClosed':
-			var key = mess.a.key;
-			var bytesQueued = mess.a.bytesQueued;
-			var code = mess.a.code;
-			var reason = mess.a.reason;
-			var wasClean = mess.a.wasClean;
-			return 'PIClosed { key = \"' + (key + ('\", bytesQueued = \"' + (elm$core$String$fromInt(bytesQueued) + ('\", code = \"' + (elm$core$String$fromInt(code) + ('\", reason = \"' + (reason + ('\", wasClean = \"' + (wasClean ? 'True' : ('False' + '\"}'))))))))));
-		case 'POBytesQueued':
-			var key = mess.a.key;
-			return 'POBytesQueued { key = \"' + (key + '\"}');
-		case 'PIBytesQueued':
-			var key = mess.a.key;
-			var bufferedAmount = mess.a.bufferedAmount;
-			return 'PIBytesQueued { key = \"' + (key + ('\", bufferedAmount = \"' + (elm$core$String$fromInt(bufferedAmount) + '\"}')));
-		case 'PODelay':
-			var millis = mess.a.millis;
-			var id = mess.a.id;
-			return 'PODelay { millis = \"' + (elm$core$String$fromInt(millis) + ('\" id = \"' + (id + '\"}')));
-		case 'PIDelayed':
-			var id = mess.a.id;
-			return 'PIDelayed { id = \"' + (id + '\"}');
-		default:
-			var key = mess.a.key;
-			var code = mess.a.code;
-			var description = mess.a.description;
-			var name = mess.a.name;
-			return 'PIError { key = \"' + (author$project$PortFunnel$WebSocket$maybeString(key) + ('\" code = \"' + (code + ('\" description = \"' + (description + ('\" name = \"' + (author$project$PortFunnel$WebSocket$maybeString(name) + '\"}')))))));
-	}
-};
-var author$project$PortFunnel$WebSocket$errorToString = function (theError) {
-	switch (theError.$) {
-		case 'SocketAlreadyOpenError':
-			var key = theError.a;
-			return 'SocketAlreadyOpenError \"' + (key + '\"');
-		case 'SocketConnectingError':
-			var key = theError.a;
-			return 'SocketConnectingError \"' + (key + '\"');
-		case 'SocketClosingError':
-			var key = theError.a;
-			return 'SocketClosingError \"' + (key + '\"');
-		case 'SocketNotOpenError':
-			var key = theError.a;
-			return 'SocketNotOpenError \"' + (key + '\"');
-		case 'UnexpectedConnectedError':
-			var key = theError.a.key;
-			var description = theError.a.description;
-			return 'UnexpectedConnectedError\n { key = \"' + (key + ('\", description = \"' + (description + '\" }')));
-		case 'UnexpectedMessageError':
-			var key = theError.a.key;
-			var message = theError.a.message;
-			return 'UnexpectedMessageError { key = \"' + (key + ('\", message = \"' + (message + '\" }')));
-		case 'LowLevelError':
-			var key = theError.a.key;
-			var code = theError.a.code;
-			var description = theError.a.description;
-			var name = theError.a.name;
-			return 'LowLevelError { key = \"' + (author$project$PortFunnel$WebSocket$maybeStringToString(key) + ('\", code = \"' + (code + ('\", description = \"' + (description + ('\", code = \"' + (author$project$PortFunnel$WebSocket$maybeStringToString(name) + '\" }')))))));
-		default:
-			var message = theError.a.message;
-			return 'InvalidMessageError: ' + author$project$PortFunnel$WebSocket$toString(message);
-	}
-};
-var author$project$Main$socketHandler = F3(
-	function (response, state, mdl) {
-		var model = _Utils_update(
-			mdl,
-			{error: elm$core$Maybe$Nothing, funnelState: state});
-		switch (response.$) {
-			case 'MessageReceivedResponse':
-				var message = response.a.message;
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-					_Utils_update(
-						model,
-						{
-							log: A2(elm$core$List$cons, 'Received \"' + (message + '\"'), model.log)
-						}));
-			case 'ConnectedResponse':
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-					_Utils_update(
-						model,
-						{
-							log: A2(elm$core$List$cons, 'Connected', model.log)
-						}));
-			case 'ClosedResponse':
-				var code = response.a.code;
-				var wasClean = response.a.wasClean;
-				var expected = response.a.expected;
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-					_Utils_update(
-						model,
-						{
-							log: A2(
-								elm$core$List$cons,
-								'Closed, ' + A3(author$project$Main$closedString, code, wasClean, expected),
-								model.log)
-						}));
-			case 'ErrorResponse':
-				var error = response.a;
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-					_Utils_update(
-						model,
-						{
-							log: A2(
-								elm$core$List$cons,
-								author$project$PortFunnel$WebSocket$errorToString(error),
-								model.log)
-						}));
-			default:
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(model);
-		}
-	});
-var author$project$PortFunnel$WebSocket$moduleName = 'WebSocket';
-var billstclair$elm_port_funnel$PortFunnel$GenericMessage = F3(
-	function (moduleName, tag, args) {
-		return {args: args, moduleName: moduleName, tag: tag};
-	});
-var elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							elm$core$List$foldl,
-							fn,
-							acc,
-							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
-		}
-	});
-var elm$core$List$concat = function (lists) {
-	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
-};
-var elm$json$Json$Encode$bool = _Json_wrap;
-var elm$json$Json$Encode$int = _Json_wrap;
-var elm$json$Json$Encode$null = _Json_encodeNull;
-var elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			elm$core$List$foldl,
-			F2(
-				function (_n0, obj) {
-					var k = _n0.a;
-					var v = _n0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var elm$json$Json$Encode$string = _Json_wrap;
-var author$project$PortFunnel$WebSocket$encode = function (mess) {
-	var gm = F2(
-		function (tag, args) {
-			return A3(billstclair$elm_port_funnel$PortFunnel$GenericMessage, author$project$PortFunnel$WebSocket$moduleName, tag, args);
-		});
-	switch (mess.$) {
-		case 'Startup':
-			return A2(gm, 'startup', elm$json$Json$Encode$null);
-		case 'POOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
-			return A2(
-				gm,
-				'open',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'url',
-							elm$json$Json$Encode$string(url))
-						])));
-		case 'POSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
-			return A2(
-				gm,
-				'send',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'message',
-							elm$json$Json$Encode$string(message))
-						])));
-		case 'POClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
-			return A2(
-				gm,
-				'close',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'reason',
-							elm$json$Json$Encode$string(reason))
-						])));
-		case 'POBytesQueued':
-			var key = mess.a.key;
-			return A2(
-				gm,
-				'getBytesQueued',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key))
-						])));
-		case 'PODelay':
-			var millis = mess.a.millis;
-			var id = mess.a.id;
-			return A2(
-				gm,
-				'delay',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'millis',
-							elm$json$Json$Encode$int(millis)),
-							_Utils_Tuple2(
-							'id',
-							elm$json$Json$Encode$string(id))
-						])));
-		case 'PWillOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
-			var keepAlive = mess.a.keepAlive;
-			return A2(
-				gm,
-				'willopen',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'url',
-							elm$json$Json$Encode$string(url)),
-							_Utils_Tuple2(
-							'keepAlive',
-							elm$json$Json$Encode$bool(keepAlive))
-						])));
-		case 'PWillSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
-			return A2(
-				gm,
-				'willsend',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'message',
-							elm$json$Json$Encode$string(message))
-						])));
-		case 'PWillClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
-			return A2(
-				gm,
-				'willclose',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'reason',
-							elm$json$Json$Encode$string(reason))
-						])));
-		case 'PIConnected':
-			var key = mess.a.key;
-			var description = mess.a.description;
-			return A2(
-				gm,
-				'connected',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'description',
-							elm$json$Json$Encode$string(description))
-						])));
-		case 'PIMessageReceived':
-			var key = mess.a.key;
-			var message = mess.a.message;
-			return A2(
-				gm,
-				'messageReceived',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'message',
-							elm$json$Json$Encode$string(message))
-						])));
-		case 'PIClosed':
-			var key = mess.a.key;
-			var bytesQueued = mess.a.bytesQueued;
-			var code = mess.a.code;
-			var reason = mess.a.reason;
-			var wasClean = mess.a.wasClean;
-			return A2(
-				gm,
-				'closed',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'bytesQueued',
-							elm$json$Json$Encode$int(bytesQueued)),
-							_Utils_Tuple2(
-							'code',
-							elm$json$Json$Encode$int(code)),
-							_Utils_Tuple2(
-							'reason',
-							elm$json$Json$Encode$string(reason)),
-							_Utils_Tuple2(
-							'wasClean',
-							elm$json$Json$Encode$bool(wasClean))
-						])));
-		case 'PIBytesQueued':
-			var key = mess.a.key;
-			var bufferedAmount = mess.a.bufferedAmount;
-			return A2(
-				gm,
-				'bytesQueued',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'key',
-							elm$json$Json$Encode$string(key)),
-							_Utils_Tuple2(
-							'bufferedAmount',
-							elm$json$Json$Encode$int(bufferedAmount))
-						])));
-		case 'PIDelayed':
-			var id = mess.a.id;
-			return A2(
-				gm,
-				'delayed',
-				elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'id',
-							elm$json$Json$Encode$string(id))
-						])));
-		default:
-			var key = mess.a.key;
-			var code = mess.a.code;
-			var description = mess.a.description;
-			var name = mess.a.name;
-			var message = mess.a.message;
-			return A2(
-				gm,
-				'error',
-				elm$json$Json$Encode$object(
-					elm$core$List$concat(
-						_List_fromArray(
-							[
-								function () {
-								if (key.$ === 'Just') {
-									var k = key.a;
-									return _List_fromArray(
-										[
-											_Utils_Tuple2(
-											'key',
-											elm$json$Json$Encode$string(k))
-										]);
-								} else {
-									return _List_Nil;
-								}
-							}(),
-								_List_fromArray(
-								[
-									_Utils_Tuple2(
-									'code',
-									elm$json$Json$Encode$string(code)),
-									_Utils_Tuple2(
-									'description',
-									elm$json$Json$Encode$string(description))
-								]),
-								function () {
-								if (name.$ === 'Just') {
-									var n = name.a;
-									return _List_fromArray(
-										[
-											_Utils_Tuple2(
-											'name',
-											elm$json$Json$Encode$string(n))
-										]);
-								} else {
-									return _List_Nil;
-								}
-							}(),
-								function () {
-								if (message.$ === 'Just') {
-									var m = message.a;
-									return _List_fromArray(
-										[
-											_Utils_Tuple2(
-											'message',
-											elm$json$Json$Encode$string(m))
-										]);
-								} else {
-									return _List_Nil;
-								}
-							}()
-							]))));
-	}
-};
-var elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
-var author$project$PortFunnel$WebSocket$commander = F2(
-	function (gfPort, response) {
-		switch (response.$) {
-			case 'CmdResponse':
-				var message = response.a;
-				return gfPort(
-					author$project$PortFunnel$WebSocket$encode(message));
-			case 'ListResponse':
-				var responses = response.a;
-				return elm$core$Platform$Cmd$batch(
-					A2(
-						elm$core$List$map,
-						A2(elm$core$Basics$composeR, author$project$PortFunnel$WebSocket$encode, gfPort),
-						A3(
-							elm$core$List$foldl,
-							F2(
-								function (rsp, res) {
-									if (rsp.$ === 'CmdResponse') {
-										var message = rsp.a;
-										return A2(elm$core$List$cons, message, res);
-									} else {
-										return res;
-									}
-								}),
-							_List_Nil,
-							responses)));
-			default:
-				return elm$core$Platform$Cmd$none;
-		}
-	});
+var author$project$Main$cmdPort = _Platform_outgoingPort('cmdPort', elm$core$Basics$identity);
 var elm$json$Json$Decode$map2 = _Json_map2;
 var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = elm$json$Json$Decode$map2(elm$core$Basics$apR);
 var elm$json$Json$Decode$andThen = _Json_andThen;
@@ -5869,6 +5221,382 @@ var author$project$PortFunnel$WebSocket$decode = function (_n0) {
 										elm$json$Json$Decode$succeed(author$project$PortFunnel$WebSocket$InternalMessage$PIErrorRecord))))))));
 		default:
 			return elm$core$Result$Err('Unknown tag: ' + tag);
+	}
+};
+var author$project$PortFunnel$WebSocket$moduleName = 'WebSocket';
+var billstclair$elm_port_funnel$PortFunnel$GenericMessage = F3(
+	function (moduleName, tag, args) {
+		return {args: args, moduleName: moduleName, tag: tag};
+	});
+var elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							elm$core$List$foldl,
+							fn,
+							acc,
+							elm$core$List$reverse(r4)) : A4(elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
+		}
+	});
+var elm$core$List$concat = function (lists) {
+	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
+};
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$json$Json$Encode$int = _Json_wrap;
+var elm$json$Json$Encode$null = _Json_encodeNull;
+var elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, obj) {
+					var k = _n0.a;
+					var v = _n0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var elm$json$Json$Encode$string = _Json_wrap;
+var author$project$PortFunnel$WebSocket$encode = function (mess) {
+	var gm = F2(
+		function (tag, args) {
+			return A3(billstclair$elm_port_funnel$PortFunnel$GenericMessage, author$project$PortFunnel$WebSocket$moduleName, tag, args);
+		});
+	switch (mess.$) {
+		case 'Startup':
+			return A2(gm, 'startup', elm$json$Json$Encode$null);
+		case 'POOpen':
+			var key = mess.a.key;
+			var url = mess.a.url;
+			return A2(
+				gm,
+				'open',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'url',
+							elm$json$Json$Encode$string(url))
+						])));
+		case 'POSend':
+			var key = mess.a.key;
+			var message = mess.a.message;
+			return A2(
+				gm,
+				'send',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'message',
+							elm$json$Json$Encode$string(message))
+						])));
+		case 'POClose':
+			var key = mess.a.key;
+			var reason = mess.a.reason;
+			return A2(
+				gm,
+				'close',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'reason',
+							elm$json$Json$Encode$string(reason))
+						])));
+		case 'POBytesQueued':
+			var key = mess.a.key;
+			return A2(
+				gm,
+				'getBytesQueued',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key))
+						])));
+		case 'PODelay':
+			var millis = mess.a.millis;
+			var id = mess.a.id;
+			return A2(
+				gm,
+				'delay',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'millis',
+							elm$json$Json$Encode$int(millis)),
+							_Utils_Tuple2(
+							'id',
+							elm$json$Json$Encode$string(id))
+						])));
+		case 'PWillOpen':
+			var key = mess.a.key;
+			var url = mess.a.url;
+			var keepAlive = mess.a.keepAlive;
+			return A2(
+				gm,
+				'willopen',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'url',
+							elm$json$Json$Encode$string(url)),
+							_Utils_Tuple2(
+							'keepAlive',
+							elm$json$Json$Encode$bool(keepAlive))
+						])));
+		case 'PWillSend':
+			var key = mess.a.key;
+			var message = mess.a.message;
+			return A2(
+				gm,
+				'willsend',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'message',
+							elm$json$Json$Encode$string(message))
+						])));
+		case 'PWillClose':
+			var key = mess.a.key;
+			var reason = mess.a.reason;
+			return A2(
+				gm,
+				'willclose',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'reason',
+							elm$json$Json$Encode$string(reason))
+						])));
+		case 'PIConnected':
+			var key = mess.a.key;
+			var description = mess.a.description;
+			return A2(
+				gm,
+				'connected',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'description',
+							elm$json$Json$Encode$string(description))
+						])));
+		case 'PIMessageReceived':
+			var key = mess.a.key;
+			var message = mess.a.message;
+			return A2(
+				gm,
+				'messageReceived',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'message',
+							elm$json$Json$Encode$string(message))
+						])));
+		case 'PIClosed':
+			var key = mess.a.key;
+			var bytesQueued = mess.a.bytesQueued;
+			var code = mess.a.code;
+			var reason = mess.a.reason;
+			var wasClean = mess.a.wasClean;
+			return A2(
+				gm,
+				'closed',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'bytesQueued',
+							elm$json$Json$Encode$int(bytesQueued)),
+							_Utils_Tuple2(
+							'code',
+							elm$json$Json$Encode$int(code)),
+							_Utils_Tuple2(
+							'reason',
+							elm$json$Json$Encode$string(reason)),
+							_Utils_Tuple2(
+							'wasClean',
+							elm$json$Json$Encode$bool(wasClean))
+						])));
+		case 'PIBytesQueued':
+			var key = mess.a.key;
+			var bufferedAmount = mess.a.bufferedAmount;
+			return A2(
+				gm,
+				'bytesQueued',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'key',
+							elm$json$Json$Encode$string(key)),
+							_Utils_Tuple2(
+							'bufferedAmount',
+							elm$json$Json$Encode$int(bufferedAmount))
+						])));
+		case 'PIDelayed':
+			var id = mess.a.id;
+			return A2(
+				gm,
+				'delayed',
+				elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'id',
+							elm$json$Json$Encode$string(id))
+						])));
+		default:
+			var key = mess.a.key;
+			var code = mess.a.code;
+			var description = mess.a.description;
+			var name = mess.a.name;
+			var message = mess.a.message;
+			return A2(
+				gm,
+				'error',
+				elm$json$Json$Encode$object(
+					elm$core$List$concat(
+						_List_fromArray(
+							[
+								function () {
+								if (key.$ === 'Just') {
+									var k = key.a;
+									return _List_fromArray(
+										[
+											_Utils_Tuple2(
+											'key',
+											elm$json$Json$Encode$string(k))
+										]);
+								} else {
+									return _List_Nil;
+								}
+							}(),
+								_List_fromArray(
+								[
+									_Utils_Tuple2(
+									'code',
+									elm$json$Json$Encode$string(code)),
+									_Utils_Tuple2(
+									'description',
+									elm$json$Json$Encode$string(description))
+								]),
+								function () {
+								if (name.$ === 'Just') {
+									var n = name.a;
+									return _List_fromArray(
+										[
+											_Utils_Tuple2(
+											'name',
+											elm$json$Json$Encode$string(n))
+										]);
+								} else {
+									return _List_Nil;
+								}
+							}(),
+								function () {
+								if (message.$ === 'Just') {
+									var m = message.a;
+									return _List_fromArray(
+										[
+											_Utils_Tuple2(
+											'message',
+											elm$json$Json$Encode$string(m))
+										]);
+								} else {
+									return _List_Nil;
+								}
+							}()
+							]))));
 	}
 };
 var author$project$PortFunnel$WebSocket$AbnormalClosure = {$: 'AbnormalClosure'};
@@ -6922,7 +6650,8 @@ var author$project$PortFunnel$WebSocket$process = F2(
 				var reason = closedRecord.reason;
 				var wasClean = closedRecord.wasClean;
 				var socketState = A2(author$project$PortFunnel$WebSocket$getSocketState, key, state);
-				return ((!_Utils_eq(socketState.phase, author$project$PortFunnel$WebSocket$ClosingPhase)) && (!A2(elm$core$Set$member, key, state.noAutoReopenKeys))) ? A2(author$project$PortFunnel$WebSocket$handleUnexpectedClose, state, closedRecord) : _Utils_Tuple2(
+				var expected = _Utils_eq(socketState.phase, author$project$PortFunnel$WebSocket$ClosingPhase);
+				return ((!expected) && (!A2(elm$core$Set$member, key, state.noAutoReopenKeys))) ? A2(author$project$PortFunnel$WebSocket$handleUnexpectedClose, state, closedRecord) : _Utils_Tuple2(
 					author$project$PortFunnel$WebSocket$State(
 						_Utils_update(
 							state,
@@ -6932,7 +6661,7 @@ var author$project$PortFunnel$WebSocket$process = F2(
 					author$project$PortFunnel$WebSocket$ClosedResponse(
 						{
 							code: author$project$PortFunnel$WebSocket$closedCode(code),
-							expected: true,
+							expected: expected,
 							key: key,
 							reason: reason,
 							wasClean: wasClean
@@ -7019,69 +6748,6 @@ var billstclair$elm_port_funnel$PortFunnel$makeModuleDesc = F4(
 			A4(billstclair$elm_port_funnel$PortFunnel$ModuleDescRecord, name, encoder, decoder, processor));
 	});
 var author$project$PortFunnel$WebSocket$moduleDesc = A4(billstclair$elm_port_funnel$PortFunnel$makeModuleDesc, author$project$PortFunnel$WebSocket$moduleName, author$project$PortFunnel$WebSocket$encode, author$project$PortFunnel$WebSocket$decode, author$project$PortFunnel$WebSocket$process);
-var billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
-	function (accessors, moduleDesc, commander, handler) {
-		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
-	});
-var author$project$Main$funnels = elm$core$Dict$fromList(
-	_List_fromArray(
-		[
-			_Utils_Tuple2(
-			author$project$PortFunnel$WebSocket$moduleName,
-			author$project$Main$SocketFunnel(
-				A4(billstclair$elm_port_funnel$PortFunnel$FunnelSpec, author$project$Main$socketAccessors, author$project$PortFunnel$WebSocket$moduleDesc, author$project$PortFunnel$WebSocket$commander, author$project$Main$socketHandler)))
-		]));
-var billstclair$elm_port_funnel$PortFunnel$decodeValue = F2(
-	function (decoder, value) {
-		var _n0 = A2(elm$json$Json$Decode$decodeValue, decoder, value);
-		if (_n0.$ === 'Ok') {
-			var res = _n0.a;
-			return elm$core$Result$Ok(res);
-		} else {
-			var err = _n0.a;
-			return elm$core$Result$Err(
-				elm$json$Json$Decode$errorToString(err));
-		}
-	});
-var elm$json$Json$Decode$map3 = _Json_map3;
-var billstclair$elm_port_funnel$PortFunnel$genericMessageDecoder = A4(
-	elm$json$Json$Decode$map3,
-	billstclair$elm_port_funnel$PortFunnel$GenericMessage,
-	A2(elm$json$Json$Decode$field, 'module', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'tag', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'args', elm$json$Json$Decode$value));
-var billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage = function (value) {
-	return A2(billstclair$elm_port_funnel$PortFunnel$decodeValue, billstclair$elm_port_funnel$PortFunnel$genericMessageDecoder, value);
-};
-var author$project$Main$genericProcess = F5(
-	function (funnelsDict, theProcessor, value, state, model) {
-		var _n0 = billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage(value);
-		if (_n0.$ === 'Err') {
-			var error = _n0.a;
-			return elm$core$Result$Err(error);
-		} else {
-			var genericMessage = _n0.a;
-			var moduleName = genericMessage.moduleName;
-			var _n1 = A2(elm$core$Dict$get, moduleName, funnelsDict);
-			if (_n1.$ === 'Just') {
-				var funnel = _n1.a;
-				var _n2 = A4(theProcessor, genericMessage, funnel, state, model);
-				if (_n2.$ === 'Err') {
-					var error = _n2.a;
-					return elm$core$Result$Err(error);
-				} else {
-					var _n3 = _n2.a;
-					var model2 = _n3.a;
-					var cmd = _n3.b;
-					return elm$core$Result$Ok(
-						_Utils_Tuple3(funnel, model2, cmd));
-				}
-			} else {
-				return elm$core$Result$Err('Unknown moduleName: ' + moduleName);
-			}
-		}
-	});
-var author$project$Main$cmdPort = _Platform_outgoingPort('cmdPort', elm$core$Basics$identity);
 var author$project$PortFunnel$WebSocket$simulator = function (mess) {
 	switch (mess.$) {
 		case 'Startup':
@@ -7145,6 +6811,28 @@ var author$project$PortFunnel$WebSocket$simulator = function (mess) {
 					}));
 	}
 };
+var billstclair$elm_port_funnel$PortFunnel$decodeValue = F2(
+	function (decoder, value) {
+		var _n0 = A2(elm$json$Json$Decode$decodeValue, decoder, value);
+		if (_n0.$ === 'Ok') {
+			var res = _n0.a;
+			return elm$core$Result$Ok(res);
+		} else {
+			var err = _n0.a;
+			return elm$core$Result$Err(
+				elm$json$Json$Decode$errorToString(err));
+		}
+	});
+var elm$json$Json$Decode$map3 = _Json_map3;
+var billstclair$elm_port_funnel$PortFunnel$genericMessageDecoder = A4(
+	elm$json$Json$Decode$map3,
+	billstclair$elm_port_funnel$PortFunnel$GenericMessage,
+	A2(elm$json$Json$Decode$field, 'module', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'tag', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'args', elm$json$Json$Decode$value));
+var billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage = function (value) {
+	return A2(billstclair$elm_port_funnel$PortFunnel$decodeValue, billstclair$elm_port_funnel$PortFunnel$genericMessageDecoder, value);
+};
 var billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage = function (message) {
 	return elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -7163,6 +6851,20 @@ var elm$core$Task$Perform = function (a) {
 };
 var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
+var elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
 var elm$core$Task$andThen = _Scheduler_andThen;
 var elm$core$Task$map = F2(
 	function (func, taskA) {
@@ -7276,11 +6978,6 @@ var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
 			model,
 			elm$core$Platform$Cmd$batch(cmds));
 	});
-var billstclair$elm_port_funnel$PortFunnel$genericMessageToCmdPort = F2(
-	function (cmdPort, genericMessage) {
-		return cmdPort(
-			billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage(genericMessage));
-	});
 var billstclair$elm_port_funnel$PortFunnel$process = F4(
 	function (accessors, _n0, genericMessage, state) {
 		var moduleDesc = _n0.a;
@@ -7310,10 +7007,11 @@ var billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
 			var _n1 = _n0.a;
 			var state2 = _n1.a;
 			var response = _n1.b;
-			var cmd = A2(
-				funnel.commander,
-				billstclair$elm_port_funnel$PortFunnel$genericMessageToCmdPort(cmdPort),
-				response);
+			var gmToCmdPort = function (gm) {
+				return cmdPort(
+					billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage(gm));
+			};
+			var cmd = A2(funnel.commander, gmToCmdPort, response);
 			var _n2 = A3(funnel.handler, response, state2, model);
 			var model2 = _n2.a;
 			var cmd2 = _n2.b;
@@ -7325,12 +7023,293 @@ var billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
 					model2));
 		}
 	});
-var author$project$Main$processor = F4(
-	function (genericMessage, funnel, funnelState, model) {
+var author$project$Main$appTrampoline = F4(
+	function (genericMessage, funnel, state, model) {
 		var theCmdPort = author$project$Main$getCmdPort(model);
 		var appFunnel = funnel.a;
-		return A5(billstclair$elm_port_funnel$PortFunnel$appProcess, theCmdPort, genericMessage, appFunnel, funnelState, model);
+		return A5(billstclair$elm_port_funnel$PortFunnel$appProcess, theCmdPort, genericMessage, appFunnel, state, model);
 	});
+var author$project$Main$SocketFunnel = function (a) {
+	return {$: 'SocketFunnel', a: a};
+};
+var billstclair$elm_port_funnel$PortFunnel$StateAccessors = F2(
+	function (get, set) {
+		return {get: get, set: set};
+	});
+var author$project$Main$socketAccessors = A2(
+	billstclair$elm_port_funnel$PortFunnel$StateAccessors,
+	function ($) {
+		return $.socket;
+	},
+	F2(
+		function (substate, state) {
+			return _Utils_update(
+				state,
+				{socket: substate});
+		}));
+var author$project$PortFunnel$WebSocket$closedCodeToString = function (code) {
+	switch (code.$) {
+		case 'NormalClosure':
+			return 'Normal';
+		case 'GoingAwayClosure':
+			return 'GoingAway';
+		case 'ProtocolErrorClosure':
+			return 'ProtocolError';
+		case 'UnsupportedDataClosure':
+			return 'UnsupportedData';
+		case 'NoStatusRecvdClosure':
+			return 'NoStatusRecvd';
+		case 'AbnormalClosure':
+			return 'Abnormal';
+		case 'InvalidFramePayloadDataClosure':
+			return 'InvalidFramePayloadData';
+		case 'PolicyViolationClosure':
+			return 'PolicyViolation';
+		case 'MessageTooBigClosure':
+			return 'MessageTooBig';
+		case 'MissingExtensionClosure':
+			return 'MissingExtension';
+		case 'InternalErrorClosure':
+			return 'InternalError';
+		case 'ServiceRestartClosure':
+			return 'ServiceRestart';
+		case 'TryAgainLaterClosure':
+			return 'TryAgainLater';
+		case 'BadGatewayClosure':
+			return 'BadGateway';
+		case 'TLSHandshakeClosure':
+			return 'TLSHandshake';
+		case 'TimedOutOnReconnect':
+			return 'TimedOutOnReconnect';
+		default:
+			return 'UnknownClosureCode';
+	}
+};
+var author$project$Main$closedString = F3(
+	function (code, wasClean, expected) {
+		return 'code: ' + (author$project$PortFunnel$WebSocket$closedCodeToString(code) + (', ' + ((wasClean ? 'clean' : 'not clean') + (', ' + (expected ? 'expected' : 'NOT expected')))));
+	});
+var author$project$PortFunnel$WebSocket$isLoaded = function (_n0) {
+	var state = _n0.a;
+	return state.isLoaded;
+};
+var author$project$Main$doIsLoaded = function (model) {
+	return ((!model.wasLoaded) && author$project$PortFunnel$WebSocket$isLoaded(model.state.socket)) ? _Utils_update(
+		model,
+		{useSimulator: false, wasLoaded: true}) : model;
+};
+var author$project$PortFunnel$WebSocket$maybeStringToString = function (string) {
+	if (string.$ === 'Nothing') {
+		return 'Nothing';
+	} else {
+		var s = string.a;
+		return 'Just \"' + (s + '\"');
+	}
+};
+var author$project$PortFunnel$WebSocket$maybeString = function (s) {
+	if (s.$ === 'Nothing') {
+		return 'Nothing';
+	} else {
+		var string = s.a;
+		return 'Just ' + string;
+	}
+};
+var author$project$PortFunnel$WebSocket$toString = function (mess) {
+	switch (mess.$) {
+		case 'Startup':
+			return '<Startup>';
+		case 'PWillOpen':
+			var key = mess.a.key;
+			var url = mess.a.url;
+			var keepAlive = mess.a.keepAlive;
+			return 'PWillOpen { key = \"' + (key + ('\", url = \"' + (url + ('\", keepAlive = ' + (keepAlive ? 'True' : ('False' + '}'))))));
+		case 'POOpen':
+			var key = mess.a.key;
+			var url = mess.a.url;
+			return 'POOpen { key = \"' + (key + ('\", url = \"' + (url + '\"}')));
+		case 'PIConnected':
+			var key = mess.a.key;
+			var description = mess.a.description;
+			return 'PIConnected { key = \"' + (key + ('\", description = \"' + (description + '\"}')));
+		case 'PWillSend':
+			var key = mess.a.key;
+			var message = mess.a.message;
+			return 'PWillSend { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
+		case 'POSend':
+			var key = mess.a.key;
+			var message = mess.a.message;
+			return 'POSend { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
+		case 'PIMessageReceived':
+			var key = mess.a.key;
+			var message = mess.a.message;
+			return 'PIMessageReceived { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
+		case 'PWillClose':
+			var key = mess.a.key;
+			var reason = mess.a.reason;
+			return 'PWillClose { key = \"' + (key + ('\", reason = \"' + (reason + '\"}')));
+		case 'POClose':
+			var key = mess.a.key;
+			var reason = mess.a.reason;
+			return 'POClose { key = \"' + (key + ('\", reason = \"' + (reason + '\"}')));
+		case 'PIClosed':
+			var key = mess.a.key;
+			var bytesQueued = mess.a.bytesQueued;
+			var code = mess.a.code;
+			var reason = mess.a.reason;
+			var wasClean = mess.a.wasClean;
+			return 'PIClosed { key = \"' + (key + ('\", bytesQueued = \"' + (elm$core$String$fromInt(bytesQueued) + ('\", code = \"' + (elm$core$String$fromInt(code) + ('\", reason = \"' + (reason + ('\", wasClean = \"' + (wasClean ? 'True' : ('False' + '\"}'))))))))));
+		case 'POBytesQueued':
+			var key = mess.a.key;
+			return 'POBytesQueued { key = \"' + (key + '\"}');
+		case 'PIBytesQueued':
+			var key = mess.a.key;
+			var bufferedAmount = mess.a.bufferedAmount;
+			return 'PIBytesQueued { key = \"' + (key + ('\", bufferedAmount = \"' + (elm$core$String$fromInt(bufferedAmount) + '\"}')));
+		case 'PODelay':
+			var millis = mess.a.millis;
+			var id = mess.a.id;
+			return 'PODelay { millis = \"' + (elm$core$String$fromInt(millis) + ('\" id = \"' + (id + '\"}')));
+		case 'PIDelayed':
+			var id = mess.a.id;
+			return 'PIDelayed { id = \"' + (id + '\"}');
+		default:
+			var key = mess.a.key;
+			var code = mess.a.code;
+			var description = mess.a.description;
+			var name = mess.a.name;
+			return 'PIError { key = \"' + (author$project$PortFunnel$WebSocket$maybeString(key) + ('\" code = \"' + (code + ('\" description = \"' + (description + ('\" name = \"' + (author$project$PortFunnel$WebSocket$maybeString(name) + '\"}')))))));
+	}
+};
+var author$project$PortFunnel$WebSocket$errorToString = function (theError) {
+	switch (theError.$) {
+		case 'SocketAlreadyOpenError':
+			var key = theError.a;
+			return 'SocketAlreadyOpenError \"' + (key + '\"');
+		case 'SocketConnectingError':
+			var key = theError.a;
+			return 'SocketConnectingError \"' + (key + '\"');
+		case 'SocketClosingError':
+			var key = theError.a;
+			return 'SocketClosingError \"' + (key + '\"');
+		case 'SocketNotOpenError':
+			var key = theError.a;
+			return 'SocketNotOpenError \"' + (key + '\"');
+		case 'UnexpectedConnectedError':
+			var key = theError.a.key;
+			var description = theError.a.description;
+			return 'UnexpectedConnectedError\n { key = \"' + (key + ('\", description = \"' + (description + '\" }')));
+		case 'UnexpectedMessageError':
+			var key = theError.a.key;
+			var message = theError.a.message;
+			return 'UnexpectedMessageError { key = \"' + (key + ('\", message = \"' + (message + '\" }')));
+		case 'LowLevelError':
+			var key = theError.a.key;
+			var code = theError.a.code;
+			var description = theError.a.description;
+			var name = theError.a.name;
+			return 'LowLevelError { key = \"' + (author$project$PortFunnel$WebSocket$maybeStringToString(key) + ('\", code = \"' + (code + ('\", description = \"' + (description + ('\", code = \"' + (author$project$PortFunnel$WebSocket$maybeStringToString(name) + '\" }')))))));
+		default:
+			var message = theError.a.message;
+			return 'InvalidMessageError: ' + author$project$PortFunnel$WebSocket$toString(message);
+	}
+};
+var author$project$Main$socketHandler = F3(
+	function (response, state, mdl) {
+		var model = author$project$Main$doIsLoaded(
+			_Utils_update(
+				mdl,
+				{error: elm$core$Maybe$Nothing, state: state}));
+		switch (response.$) {
+			case 'MessageReceivedResponse':
+				var message = response.a.message;
+				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
+					_Utils_update(
+						model,
+						{
+							log: A2(elm$core$List$cons, 'Received \"' + (message + '\"'), model.log)
+						}));
+			case 'ConnectedResponse':
+				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
+					_Utils_update(
+						model,
+						{
+							log: A2(elm$core$List$cons, 'Connected', model.log)
+						}));
+			case 'ClosedResponse':
+				var code = response.a.code;
+				var wasClean = response.a.wasClean;
+				var expected = response.a.expected;
+				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
+					_Utils_update(
+						model,
+						{
+							log: A2(
+								elm$core$List$cons,
+								'Closed, ' + A3(author$project$Main$closedString, code, wasClean, expected),
+								model.log)
+						}));
+			case 'ErrorResponse':
+				var error = response.a;
+				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
+					_Utils_update(
+						model,
+						{
+							log: A2(
+								elm$core$List$cons,
+								author$project$PortFunnel$WebSocket$errorToString(error),
+								model.log)
+						}));
+			default:
+				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(model);
+		}
+	});
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var author$project$PortFunnel$WebSocket$commander = F2(
+	function (gfPort, response) {
+		switch (response.$) {
+			case 'CmdResponse':
+				var message = response.a;
+				return gfPort(
+					author$project$PortFunnel$WebSocket$encode(message));
+			case 'ListResponse':
+				var responses = response.a;
+				return elm$core$Platform$Cmd$batch(
+					A2(
+						elm$core$List$map,
+						A2(elm$core$Basics$composeR, author$project$PortFunnel$WebSocket$encode, gfPort),
+						A3(
+							elm$core$List$foldl,
+							F2(
+								function (rsp, res) {
+									if (rsp.$ === 'CmdResponse') {
+										var message = rsp.a;
+										return A2(elm$core$List$cons, message, res);
+									} else {
+										return res;
+									}
+								}),
+							_List_Nil,
+							responses)));
+			default:
+				return elm$core$Platform$Cmd$none;
+		}
+	});
+var billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
+	function (accessors, moduleDesc, commander, handler) {
+		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
+	});
+var author$project$Main$funnels = elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(
+			author$project$PortFunnel$WebSocket$moduleName,
+			author$project$Main$SocketFunnel(
+				A4(billstclair$elm_port_funnel$PortFunnel$FunnelSpec, author$project$Main$socketAccessors, author$project$PortFunnel$WebSocket$moduleDesc, author$project$PortFunnel$WebSocket$commander, author$project$Main$socketHandler)))
+		]));
 var billstclair$elm_port_funnel$PortFunnel$messageToValue = F2(
 	function (_n0, message) {
 		var moduleDesc = _n0.a;
@@ -7350,10 +7329,6 @@ var author$project$Main$send = F2(
 			author$project$Main$getCmdPort(model),
 			message);
 	});
-var author$project$PortFunnel$WebSocket$isLoaded = function (_n0) {
-	var state = _n0.a;
-	return state.isLoaded;
-};
 var author$project$PortFunnel$WebSocket$makeClose = function (key) {
 	return author$project$PortFunnel$WebSocket$InternalMessage$PWillClose(
 		{key: key, reason: 'user request'});
@@ -7394,6 +7369,34 @@ var author$project$PortFunnel$WebSocket$willAutoReopen = F2(
 		var state = _n0.a;
 		return !A2(elm$core$Set$member, key, state.noAutoReopenKeys);
 	});
+var billstclair$elm_port_funnel$PortFunnel$processValue = F5(
+	function (funnels, appTrampoline, value, state, model) {
+		var _n0 = billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage(value);
+		if (_n0.$ === 'Err') {
+			var error = _n0.a;
+			return elm$core$Result$Err(error);
+		} else {
+			var genericMessage = _n0.a;
+			var moduleName = genericMessage.moduleName;
+			var _n1 = A2(elm$core$Dict$get, moduleName, funnels);
+			if (_n1.$ === 'Just') {
+				var funnel = _n1.a;
+				var _n2 = A4(appTrampoline, genericMessage, funnel, state, model);
+				if (_n2.$ === 'Err') {
+					var error = _n2.a;
+					return elm$core$Result$Err(error);
+				} else {
+					var _n3 = _n2.a;
+					var model2 = _n3.a;
+					var cmd = _n3.b;
+					return elm$core$Result$Ok(
+						_Utils_Tuple2(model2, cmd));
+				}
+			} else {
+				return elm$core$Result$Err('Unknown moduleName: ' + moduleName);
+			}
+		}
+	});
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7415,17 +7418,17 @@ var author$project$Main$update = F2(
 						model,
 						{useSimulator: !model.useSimulator}));
 			case 'ToggleAutoReopen':
-				var funnelState = model.funnelState;
-				var state = funnelState.socket;
-				var autoReopen = A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, state);
+				var state = model.state;
+				var socketState = state.socket;
+				var autoReopen = A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, socketState);
 				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
 					_Utils_update(
 						model,
 						{
-							funnelState: _Utils_update(
-								funnelState,
+							state: _Utils_update(
+								state,
 								{
-									socket: A3(author$project$PortFunnel$WebSocket$setAutoReopen, model.key, !autoReopen, state)
+									socket: A3(author$project$PortFunnel$WebSocket$setAutoReopen, model.key, !autoReopen, socketState)
 								})
 						}));
 			case 'Connect':
@@ -7469,7 +7472,7 @@ var author$project$Main$update = F2(
 						}));
 			default:
 				var value = msg.a;
-				var _n1 = A5(author$project$Main$genericProcess, author$project$Main$funnels, author$project$Main$processor, value, model.funnelState, model);
+				var _n1 = A5(billstclair$elm_port_funnel$PortFunnel$processValue, author$project$Main$funnels, author$project$Main$appTrampoline, value, model.state, model);
 				if (_n1.$ === 'Err') {
 					var error = _n1.a;
 					return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
@@ -7479,17 +7482,8 @@ var author$project$Main$update = F2(
 								error: elm$core$Maybe$Just(error)
 							}));
 				} else {
-					var _n2 = _n1.a;
-					var funnel = _n2.a;
-					var mdl = _n2.b;
-					var cmd = _n2.c;
-					var appFunnel = funnel.a;
-					return (mdl.useSimulator && ((!model.wasLoaded) && author$project$PortFunnel$WebSocket$isLoaded(mdl.funnelState.socket))) ? A2(
-						Janiczek$cmd_extra$Cmd$Extra$withCmd,
-						cmd,
-						_Utils_update(
-							mdl,
-							{useSimulator: false, wasLoaded: true})) : A2(Janiczek$cmd_extra$Cmd$Extra$withCmd, cmd, mdl);
+					var res = _n1.a;
+					return res;
 				}
 		}
 	});
@@ -7651,7 +7645,7 @@ var elm$html$Html$Events$onInput = function (tagger) {
 			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
 };
 var author$project$Main$view = function (model) {
-	var isConnected = A2(author$project$PortFunnel$WebSocket$isConnected, model.key, model.funnelState.socket);
+	var isConnected = A2(author$project$PortFunnel$WebSocket$isConnected, model.key, model.state.socket);
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
@@ -7755,7 +7749,7 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$Attributes$type_('checkbox'),
 								elm$html$Html$Events$onClick(author$project$Main$ToggleAutoReopen),
 								elm$html$Html$Attributes$checked(
-								A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, model.funnelState.socket))
+								A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, model.state.socket))
 							]),
 						_List_Nil)
 					])),
@@ -7783,7 +7777,9 @@ var author$project$Main$view = function (model) {
 						author$project$Main$b('Instructions:'),
 						author$project$Main$docp('Fill in the \'url\' and click \'Connect\' to connect to a real server.' + ' This will only work if you\'ve connected the port JavaScript code.'),
 						author$project$Main$docp('Fill in the text and click \'Send\' to send a message.'),
-						author$project$Main$docp('Click \'Close\' to close the connection.')
+						author$project$Main$docp('Click \'Close\' to close the connection.'),
+						author$project$Main$docp('If the \'use simulator\' checkbox is checked at startup,' + (' then you\'re either runing from \'elm reactor\' or' + ' the JavaScript code got an error starting.')),
+						author$project$Main$docp('Uncheck the \'auto reopen\' checkbox to report when the' + (' connection is lost unexpectedly, rather than the deault' + ' of attempting to reconnect.'))
 					])),
 				A2(
 				elm$html$Html$p,
