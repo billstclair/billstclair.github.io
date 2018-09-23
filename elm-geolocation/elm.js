@@ -5910,7 +5910,10 @@ var elm$html$Html$Events$onClick = function (msg) {
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$style, 'font-size', '200%')
+			]),
 		_List_fromArray(
 			[
 				A2(
