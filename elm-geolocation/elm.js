@@ -5855,7 +5855,8 @@ var elm$html$Html$br = _VirtualDom_node('br');
 var author$project$Main$br = A2(elm$html$Html$br, _List_Nil, _List_Nil);
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
-var author$project$Main$fontSize = A2(elm$html$Html$Attributes$style, 'font-size', '36px');
+var author$project$Main$buttonFontSize = A2(elm$html$Html$Attributes$style, 'font-size', '36px');
+var author$project$Main$fontSize = A2(elm$html$Html$Attributes$style, 'font-size', '24px');
 var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$p = _VirtualDom_node('p');
 var author$project$Main$ps = function (paragraphs) {
@@ -5911,7 +5912,8 @@ var elm$html$Html$Events$onClick = function (msg) {
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[author$project$Main$fontSize]),
 		_List_fromArray(
 			[
 				A2(
@@ -5949,7 +5951,7 @@ var author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								elm$html$Html$Events$onClick(author$project$Main$GetLocation),
-								author$project$Main$fontSize
+								author$project$Main$buttonFontSize
 							]),
 						_List_fromArray(
 							[
@@ -5961,7 +5963,7 @@ var author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								elm$html$Html$Events$onClick(author$project$Main$ToggleWatch),
-								author$project$Main$fontSize
+								author$project$Main$buttonFontSize
 							]),
 						_List_fromArray(
 							[
