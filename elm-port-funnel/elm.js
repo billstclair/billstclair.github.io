@@ -80,6 +80,271 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.0/optimize for better performance and smaller assets.');
 
 
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	/**/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = elm$core$Set$toList(x);
+		y = elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = elm$core$Dict$toList(x);
+		y = elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**_UNUSED/
+	if (x.$ < 0)
+	{
+		x = elm$core$Dict$toList(x);
+		y = elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**_UNUSED/
+	if (!x.$)
+	//*/
+	/**/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? elm$core$Basics$LT : n ? elm$core$Basics$GT : elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
+
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
+
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -511,271 +776,6 @@ function _Debug_regionToString(region)
 	}
 	return 'on lines ' + region.start.line + ' through ' + region.end.line;
 }
-
-
-
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	/**/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = elm$core$Set$toList(x);
-		y = elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = elm$core$Dict$toList(x);
-		y = elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**_UNUSED/
-	if (x.$ < 0)
-	{
-		x = elm$core$Dict$toList(x);
-		y = elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**_UNUSED/
-	if (!x.$)
-	//*/
-	/**/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? elm$core$Basics$LT : n ? elm$core$Basics$GT : elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
-
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -4322,38 +4322,31 @@ function _Browser_load(url)
 		}
 	}));
 }
+var author$project$Main$Process = function (a) {
+	return {$: 'Process', a: a};
+};
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
-var author$project$Main$cmdPort = _Platform_outgoingPort('cmdPort', elm$core$Basics$identity);
-var elm$core$Basics$EQ = {$: 'EQ'};
-var elm$core$Basics$LT = {$: 'LT'};
-var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var elm$core$Array$foldr = F3(
-	function (func, baseCase, _n0) {
-		var tree = _n0.c;
-		var tail = _n0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3(elm$core$Elm$JsArray$foldr, func, acc, values);
-				}
-			});
-		return A3(
-			elm$core$Elm$JsArray$foldr,
-			helper,
-			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
+var author$project$PortFunnels$cmdPort = _Platform_outgoingPort('cmdPort', elm$core$Basics$identity);
+var elm$core$Basics$apL = F2(
+	function (f, x) {
+		return f(x);
 	});
-var elm$core$List$cons = _List_cons;
-var elm$core$Array$toList = function (array) {
-	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
+var elm$core$Result$Err = function (a) {
+	return {$: 'Err', a: a};
 };
+var elm$core$Result$Ok = function (a) {
+	return {$: 'Ok', a: a};
+};
+var elm$core$Array$branchFactor = 32;
+var elm$core$Array$Array_elm_builtin = F4(
+	function (a, b, c, d) {
+		return {$: 'Array_elm_builtin', a: a, b: b, c: c, d: d};
+	});
+var elm$core$Basics$EQ = {$: 'EQ'};
 var elm$core$Basics$GT = {$: 'GT'};
+var elm$core$Basics$LT = {$: 'LT'};
 var elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -4379,6 +4372,7 @@ var elm$core$Dict$foldr = F3(
 			}
 		}
 	});
+var elm$core$List$cons = _List_cons;
 var elm$core$Dict$toList = function (dict) {
 	return A3(
 		elm$core$Dict$foldr,
@@ -4406,20 +4400,48 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
-var author$project$PortFunnel$AddXY$initialState = _List_Nil;
-var author$project$PortFunnel$Echo$State = function (a) {
-	return {$: 'State', a: a};
+var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var elm$core$Array$foldr = F3(
+	function (func, baseCase, _n0) {
+		var tree = _n0.c;
+		var tail = _n0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3(elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3(elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			elm$core$Elm$JsArray$foldr,
+			helper,
+			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
+var elm$core$Array$toList = function (array) {
+	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
-var elm$core$Basics$False = {$: 'False'};
-var author$project$PortFunnel$Echo$initialState = author$project$PortFunnel$Echo$State(
-	{isLoaded: false, messages: _List_Nil});
-var author$project$Main$initialState = {addxy: author$project$PortFunnel$AddXY$initialState, echo: author$project$PortFunnel$Echo$initialState};
-var author$project$PortFunnel$Echo$Request = function (a) {
-	return {$: 'Request', a: a};
+var elm$core$Basics$ceiling = _Basics_ceiling;
+var elm$core$Basics$fdiv = _Basics_fdiv;
+var elm$core$Basics$logBase = F2(
+	function (base, number) {
+		return _Basics_log(number) / _Basics_log(base);
+	});
+var elm$core$Basics$toFloat = _Basics_toFloat;
+var elm$core$Array$shiftStep = elm$core$Basics$ceiling(
+	A2(elm$core$Basics$logBase, 2, elm$core$Array$branchFactor));
+var elm$core$Elm$JsArray$empty = _JsArray_empty;
+var elm$core$Array$empty = A4(elm$core$Array$Array_elm_builtin, 0, elm$core$Array$shiftStep, elm$core$Elm$JsArray$empty, elm$core$Elm$JsArray$empty);
+var elm$core$Array$Leaf = function (a) {
+	return {$: 'Leaf', a: a};
 };
-var author$project$PortFunnel$Echo$makeMessage = function (string) {
-	return author$project$PortFunnel$Echo$Request(string);
+var elm$core$Array$SubTree = function (a) {
+	return {$: 'SubTree', a: a};
 };
+var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
 var elm$core$List$foldl = F3(
 	function (func, acc, list) {
 		foldl:
@@ -4439,29 +4461,6 @@ var elm$core$List$foldl = F3(
 			}
 		}
 	});
-var elm$core$Array$branchFactor = 32;
-var elm$core$Array$Array_elm_builtin = F4(
-	function (a, b, c, d) {
-		return {$: 'Array_elm_builtin', a: a, b: b, c: c, d: d};
-	});
-var elm$core$Basics$ceiling = _Basics_ceiling;
-var elm$core$Basics$fdiv = _Basics_fdiv;
-var elm$core$Basics$logBase = F2(
-	function (base, number) {
-		return _Basics_log(number) / _Basics_log(base);
-	});
-var elm$core$Basics$toFloat = _Basics_toFloat;
-var elm$core$Array$shiftStep = elm$core$Basics$ceiling(
-	A2(elm$core$Basics$logBase, 2, elm$core$Array$branchFactor));
-var elm$core$Elm$JsArray$empty = _JsArray_empty;
-var elm$core$Array$empty = A4(elm$core$Array$Array_elm_builtin, 0, elm$core$Array$shiftStep, elm$core$Elm$JsArray$empty, elm$core$Elm$JsArray$empty);
-var elm$core$Array$Leaf = function (a) {
-	return {$: 'Leaf', a: a};
-};
-var elm$core$Array$SubTree = function (a) {
-	return {$: 'SubTree', a: a};
-};
-var elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
 var elm$core$List$reverse = function (list) {
 	return A3(elm$core$List$foldl, elm$core$List$cons, _List_Nil, list);
 };
@@ -4513,10 +4512,6 @@ var elm$core$Array$treeFromBuilder = F2(
 		}
 	});
 var elm$core$Basics$add = _Basics_add;
-var elm$core$Basics$apL = F2(
-	function (f, x) {
-		return f(x);
-	});
 var elm$core$Basics$floor = _Basics_floor;
 var elm$core$Basics$gt = _Utils_gt;
 var elm$core$Basics$max = F2(
@@ -4549,6 +4544,7 @@ var elm$core$Array$builderToArray = F2(
 				builder.tail);
 		}
 	});
+var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$idiv = _Basics_idiv;
 var elm$core$Basics$lt = _Utils_lt;
 var elm$core$Elm$JsArray$initialize = _JsArray_initialize;
@@ -4595,12 +4591,6 @@ var elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
 var elm$core$Maybe$Nothing = {$: 'Nothing'};
-var elm$core$Result$Err = function (a) {
-	return {$: 'Err', a: a};
-};
-var elm$core$Result$Ok = function (a) {
-	return {$: 'Ok', a: a};
-};
 var elm$core$Basics$True = {$: 'True'};
 var elm$core$Result$isOk = function (result) {
 	if (result.$ === 'Ok') {
@@ -4814,6 +4804,36 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 			}
 		}
 	});
+var elm$json$Json$Decode$decodeValue = _Json_run;
+var author$project$PortFunnel$decodeValue = F2(
+	function (decoder, value) {
+		var _n0 = A2(elm$json$Json$Decode$decodeValue, decoder, value);
+		if (_n0.$ === 'Ok') {
+			var res = _n0.a;
+			return elm$core$Result$Ok(res);
+		} else {
+			var err = _n0.a;
+			return elm$core$Result$Err(
+				elm$json$Json$Decode$errorToString(err));
+		}
+	});
+var author$project$PortFunnel$GenericMessage = F3(
+	function (moduleName, tag, args) {
+		return {args: args, moduleName: moduleName, tag: tag};
+	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$map3 = _Json_map3;
+var elm$json$Json$Decode$string = _Json_decodeString;
+var elm$json$Json$Decode$value = _Json_decodeValue;
+var author$project$PortFunnel$genericMessageDecoder = A4(
+	elm$json$Json$Decode$map3,
+	author$project$PortFunnel$GenericMessage,
+	A2(elm$json$Json$Decode$field, 'module', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'tag', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'args', elm$json$Json$Decode$value));
+var author$project$PortFunnel$decodeGenericMessage = function (value) {
+	return A2(author$project$PortFunnel$decodeValue, author$project$PortFunnel$genericMessageDecoder, value);
+};
 var elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -4841,175 +4861,8 @@ var author$project$PortFunnel$encodeGenericMessage = function (message) {
 				_Utils_Tuple2('args', message.args)
 			]));
 };
-var author$project$PortFunnel$messageToValue = F2(
-	function (_n0, message) {
-		var moduleDesc = _n0.a;
-		return author$project$PortFunnel$encodeGenericMessage(
-			moduleDesc.encoder(message));
-	});
-var author$project$PortFunnel$sendMessage = F3(
-	function (moduleDesc, cmdPort, message) {
-		return cmdPort(
-			A2(author$project$PortFunnel$messageToValue, moduleDesc, message));
-	});
-var author$project$PortFunnel$ModuleDesc = function (a) {
-	return {$: 'ModuleDesc', a: a};
-};
-var author$project$PortFunnel$ModuleDescRecord = F4(
-	function (moduleName, encoder, decoder, process) {
-		return {decoder: decoder, encoder: encoder, moduleName: moduleName, process: process};
-	});
-var author$project$PortFunnel$makeModuleDesc = F4(
-	function (name, encoder, decoder, processor) {
-		return author$project$PortFunnel$ModuleDesc(
-			A4(author$project$PortFunnel$ModuleDescRecord, name, encoder, decoder, processor));
-	});
-var author$project$PortFunnel$Echo$Startup = {$: 'Startup'};
-var elm$json$Json$Decode$decodeValue = _Json_run;
-var elm$json$Json$Decode$string = _Json_decodeString;
-var author$project$PortFunnel$Echo$decode = function (_n0) {
-	var tag = _n0.tag;
-	var args = _n0.args;
-	switch (tag) {
-		case 'request':
-			var _n2 = A2(elm$json$Json$Decode$decodeValue, elm$json$Json$Decode$string, args);
-			if (_n2.$ === 'Ok') {
-				var string = _n2.a;
-				return elm$core$Result$Ok(
-					author$project$PortFunnel$Echo$Request(string));
-			} else {
-				return elm$core$Result$Err(
-					'Echo args not a string: ' + A2(elm$json$Json$Encode$encode, 0, args));
-			}
-		case 'startup':
-			return elm$core$Result$Ok(author$project$PortFunnel$Echo$Startup);
-		default:
-			return elm$core$Result$Err('Unknown Echo tag: ' + tag);
-	}
-};
-var author$project$PortFunnel$GenericMessage = F3(
-	function (moduleName, tag, args) {
-		return {args: args, moduleName: moduleName, tag: tag};
-	});
-var author$project$PortFunnel$Echo$moduleName = 'Echo';
-var elm$json$Json$Encode$null = _Json_encodeNull;
-var author$project$PortFunnel$Echo$encode = function (message) {
-	if (message.$ === 'Request') {
-		var string = message.a;
-		return A3(
-			author$project$PortFunnel$GenericMessage,
-			author$project$PortFunnel$Echo$moduleName,
-			'request',
-			elm$json$Json$Encode$string(string));
-	} else {
-		return A3(author$project$PortFunnel$GenericMessage, author$project$PortFunnel$Echo$moduleName, 'startup', elm$json$Json$Encode$null);
-	}
-};
-var author$project$PortFunnel$Echo$CmdResponse = function (a) {
-	return {$: 'CmdResponse', a: a};
-};
-var author$project$PortFunnel$Echo$ListResponse = function (a) {
-	return {$: 'ListResponse', a: a};
-};
-var author$project$PortFunnel$Echo$MessageResponse = function (a) {
-	return {$: 'MessageResponse', a: a};
-};
-var author$project$PortFunnel$Echo$NoResponse = {$: 'NoResponse'};
-var elm$core$String$length = _String_length;
-var elm$core$String$slice = _String_slice;
-var elm$core$String$dropLeft = F2(
-	function (n, string) {
-		return (n < 1) ? string : A3(
-			elm$core$String$slice,
-			n,
-			elm$core$String$length(string),
-			string);
-	});
-var elm$core$String$left = F2(
-	function (n, string) {
-		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
-	});
-var author$project$PortFunnel$Echo$process = F2(
-	function (message, _n0) {
-		var state = _n0.a;
-		if (message.$ === 'Startup') {
-			return _Utils_Tuple2(
-				author$project$PortFunnel$Echo$State(
-					_Utils_update(
-						state,
-						{isLoaded: true})),
-				author$project$PortFunnel$Echo$NoResponse);
-		} else {
-			var string = message.a;
-			var response = author$project$PortFunnel$Echo$MessageResponse(message);
-			var beginsDollar = A2(elm$core$String$left, 1, string) === '$';
-			return _Utils_Tuple2(
-				author$project$PortFunnel$Echo$State(
-					_Utils_update(
-						state,
-						{
-							messages: A2(elm$core$List$cons, message, state.messages)
-						})),
-				beginsDollar ? author$project$PortFunnel$Echo$ListResponse(
-					_List_fromArray(
-						[
-							response,
-							author$project$PortFunnel$Echo$CmdResponse(
-							author$project$PortFunnel$Echo$Request(
-								A2(elm$core$String$dropLeft, 1, string)))
-						])) : response);
-		}
-	});
-var author$project$PortFunnel$Echo$moduleDesc = A4(author$project$PortFunnel$makeModuleDesc, author$project$PortFunnel$Echo$moduleName, author$project$PortFunnel$Echo$encode, author$project$PortFunnel$Echo$decode, author$project$PortFunnel$Echo$process);
-var author$project$PortFunnel$Echo$send = author$project$PortFunnel$sendMessage(author$project$PortFunnel$Echo$moduleDesc);
-var author$project$Main$init = function (_n0) {
-	return _Utils_Tuple2(
-		{echo: 'foo', echoed: _List_Nil, error: elm$core$Maybe$Nothing, state: author$project$Main$initialState, sums: _List_Nil, useSimulator: true, wasLoaded: false, x: '2', y: '3'},
-		A2(
-			author$project$PortFunnel$Echo$send,
-			author$project$Main$cmdPort,
-			author$project$PortFunnel$Echo$makeMessage('If you see this, startup queueing is working.')));
-};
-var author$project$Main$Process = function (a) {
-	return {$: 'Process', a: a};
-};
-var elm$json$Json$Decode$value = _Json_decodeValue;
-var author$project$Main$subPort = _Platform_incomingPort('subPort', elm$json$Json$Decode$value);
-var author$project$Main$subscriptions = function (model) {
-	return author$project$Main$subPort(author$project$Main$Process);
-};
-var Janiczek$cmd_extra$Cmd$Extra$withCmd = F2(
-	function (cmd, model) {
-		return _Utils_Tuple2(model, cmd);
-	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var Janiczek$cmd_extra$Cmd$Extra$withNoCmd = function (model) {
-	return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-};
-var author$project$PortFunnel$decodeValue = F2(
-	function (decoder, value) {
-		var _n0 = A2(elm$json$Json$Decode$decodeValue, decoder, value);
-		if (_n0.$ === 'Ok') {
-			var res = _n0.a;
-			return elm$core$Result$Ok(res);
-		} else {
-			var err = _n0.a;
-			return elm$core$Result$Err(
-				elm$json$Json$Decode$errorToString(err));
-		}
-	});
-var elm$json$Json$Decode$field = _Json_decodeField;
-var elm$json$Json$Decode$map3 = _Json_map3;
-var author$project$PortFunnel$genericMessageDecoder = A4(
-	elm$json$Json$Decode$map3,
-	author$project$PortFunnel$GenericMessage,
-	A2(elm$json$Json$Decode$field, 'module', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'tag', elm$json$Json$Decode$string),
-	A2(elm$json$Json$Decode$field, 'args', elm$json$Json$Decode$value));
-var author$project$PortFunnel$decodeGenericMessage = function (value) {
-	return A2(author$project$PortFunnel$decodeValue, author$project$PortFunnel$genericMessageDecoder, value);
-};
 var elm$core$Task$Perform = function (a) {
 	return {$: 'Perform', a: a};
 };
@@ -5185,6 +5038,18 @@ var author$project$PortFunnel$makeSimulatedFunnelCmdPort = F4(
 				}
 			}
 		}
+	});
+var author$project$PortFunnel$ModuleDesc = function (a) {
+	return {$: 'ModuleDesc', a: a};
+};
+var author$project$PortFunnel$ModuleDescRecord = F4(
+	function (moduleName, encoder, decoder, process) {
+		return {decoder: decoder, encoder: encoder, moduleName: moduleName, process: process};
+	});
+var author$project$PortFunnel$makeModuleDesc = F4(
+	function (name, encoder, decoder, processor) {
+		return author$project$PortFunnel$ModuleDesc(
+			A4(author$project$PortFunnel$ModuleDescRecord, name, encoder, decoder, processor));
 	});
 var author$project$PortFunnel$AddXY$AddMessage = function (a) {
 	return {$: 'AddMessage', a: a};
@@ -5388,10 +5253,103 @@ var author$project$PortFunnel$AddXY$simulator = function (message) {
 	}
 };
 var author$project$PortFunnel$AddXY$makeSimulatedCmdPort = A2(author$project$PortFunnel$makeSimulatedFunnelCmdPort, author$project$PortFunnel$AddXY$moduleDesc, author$project$PortFunnel$AddXY$simulator);
-var author$project$Main$simulatedAddXYCmdPort = author$project$PortFunnel$AddXY$makeSimulatedCmdPort(author$project$Main$Process);
-var author$project$Main$getAddXYCmdPort = function (model) {
-	return model.useSimulator ? author$project$Main$simulatedAddXYCmdPort : author$project$Main$cmdPort;
+var author$project$PortFunnel$Echo$Request = function (a) {
+	return {$: 'Request', a: a};
 };
+var author$project$PortFunnel$Echo$Startup = {$: 'Startup'};
+var author$project$PortFunnel$Echo$decode = function (_n0) {
+	var tag = _n0.tag;
+	var args = _n0.args;
+	switch (tag) {
+		case 'request':
+			var _n2 = A2(elm$json$Json$Decode$decodeValue, elm$json$Json$Decode$string, args);
+			if (_n2.$ === 'Ok') {
+				var string = _n2.a;
+				return elm$core$Result$Ok(
+					author$project$PortFunnel$Echo$Request(string));
+			} else {
+				return elm$core$Result$Err(
+					'Echo args not a string: ' + A2(elm$json$Json$Encode$encode, 0, args));
+			}
+		case 'startup':
+			return elm$core$Result$Ok(author$project$PortFunnel$Echo$Startup);
+		default:
+			return elm$core$Result$Err('Unknown Echo tag: ' + tag);
+	}
+};
+var author$project$PortFunnel$Echo$moduleName = 'Echo';
+var elm$json$Json$Encode$null = _Json_encodeNull;
+var author$project$PortFunnel$Echo$encode = function (message) {
+	if (message.$ === 'Request') {
+		var string = message.a;
+		return A3(
+			author$project$PortFunnel$GenericMessage,
+			author$project$PortFunnel$Echo$moduleName,
+			'request',
+			elm$json$Json$Encode$string(string));
+	} else {
+		return A3(author$project$PortFunnel$GenericMessage, author$project$PortFunnel$Echo$moduleName, 'startup', elm$json$Json$Encode$null);
+	}
+};
+var author$project$PortFunnel$Echo$CmdResponse = function (a) {
+	return {$: 'CmdResponse', a: a};
+};
+var author$project$PortFunnel$Echo$ListResponse = function (a) {
+	return {$: 'ListResponse', a: a};
+};
+var author$project$PortFunnel$Echo$MessageResponse = function (a) {
+	return {$: 'MessageResponse', a: a};
+};
+var author$project$PortFunnel$Echo$NoResponse = {$: 'NoResponse'};
+var author$project$PortFunnel$Echo$State = function (a) {
+	return {$: 'State', a: a};
+};
+var elm$core$String$length = _String_length;
+var elm$core$String$slice = _String_slice;
+var elm$core$String$dropLeft = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3(
+			elm$core$String$slice,
+			n,
+			elm$core$String$length(string),
+			string);
+	});
+var elm$core$String$left = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
+	});
+var author$project$PortFunnel$Echo$process = F2(
+	function (message, _n0) {
+		var state = _n0.a;
+		if (message.$ === 'Startup') {
+			return _Utils_Tuple2(
+				author$project$PortFunnel$Echo$State(
+					_Utils_update(
+						state,
+						{isLoaded: true})),
+				author$project$PortFunnel$Echo$NoResponse);
+		} else {
+			var string = message.a;
+			var response = author$project$PortFunnel$Echo$MessageResponse(message);
+			var beginsDollar = A2(elm$core$String$left, 1, string) === '$';
+			return _Utils_Tuple2(
+				author$project$PortFunnel$Echo$State(
+					_Utils_update(
+						state,
+						{
+							messages: A2(elm$core$List$cons, message, state.messages)
+						})),
+				beginsDollar ? author$project$PortFunnel$Echo$ListResponse(
+					_List_fromArray(
+						[
+							response,
+							author$project$PortFunnel$Echo$CmdResponse(
+							author$project$PortFunnel$Echo$Request(
+								A2(elm$core$String$dropLeft, 1, string)))
+						])) : response);
+		}
+	});
+var author$project$PortFunnel$Echo$moduleDesc = A4(author$project$PortFunnel$makeModuleDesc, author$project$PortFunnel$Echo$moduleName, author$project$PortFunnel$Echo$encode, author$project$PortFunnel$Echo$decode, author$project$PortFunnel$Echo$process);
 var author$project$PortFunnel$Echo$simulator = function (message) {
 	if (message.$ === 'Request') {
 		var string = message.a;
@@ -5402,276 +5360,6 @@ var author$project$PortFunnel$Echo$simulator = function (message) {
 	}
 };
 var author$project$PortFunnel$Echo$makeSimulatedCmdPort = A2(author$project$PortFunnel$makeSimulatedFunnelCmdPort, author$project$PortFunnel$Echo$moduleDesc, author$project$PortFunnel$Echo$simulator);
-var author$project$Main$simulatedEchoCmdPort = author$project$PortFunnel$Echo$makeSimulatedCmdPort(author$project$Main$Process);
-var author$project$Main$getEchoCmdPort = function (model) {
-	return model.useSimulator ? author$project$Main$simulatedEchoCmdPort : author$project$Main$cmdPort;
-};
-var author$project$Main$getGMCmdPort = F2(
-	function (genericMessage, model) {
-		var moduleName = genericMessage.moduleName;
-		return _Utils_eq(moduleName, author$project$PortFunnel$Echo$moduleName) ? author$project$Main$getEchoCmdPort(model) : author$project$Main$getAddXYCmdPort(model);
-	});
-var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
-	function (cmds, model) {
-		return _Utils_Tuple2(
-			model,
-			elm$core$Platform$Cmd$batch(cmds));
-	});
-var author$project$PortFunnel$process = F4(
-	function (accessors, _n0, genericMessage, state) {
-		var moduleDesc = _n0.a;
-		var _n1 = moduleDesc.decoder(genericMessage);
-		if (_n1.$ === 'Err') {
-			var err = _n1.a;
-			return elm$core$Result$Err(err);
-		} else {
-			var message = _n1.a;
-			var substate = accessors.get(state);
-			var _n2 = A2(moduleDesc.process, message, substate);
-			var substate2 = _n2.a;
-			var response = _n2.b;
-			return elm$core$Result$Ok(
-				_Utils_Tuple2(
-					A2(accessors.set, substate2, state),
-					response));
-		}
-	});
-var author$project$PortFunnel$appProcess = F5(
-	function (cmdPort, genericMessage, funnel, state, model) {
-		var _n0 = A4(author$project$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
-		if (_n0.$ === 'Err') {
-			var error = _n0.a;
-			return elm$core$Result$Err(error);
-		} else {
-			var _n1 = _n0.a;
-			var state2 = _n1.a;
-			var response = _n1.b;
-			var gmToCmdPort = function (gm) {
-				return cmdPort(
-					author$project$PortFunnel$encodeGenericMessage(gm));
-			};
-			var cmd = A2(funnel.commander, gmToCmdPort, response);
-			var _n2 = A3(funnel.handler, response, state2, model);
-			var model2 = _n2.a;
-			var cmd2 = _n2.b;
-			return elm$core$Result$Ok(
-				A2(
-					Janiczek$cmd_extra$Cmd$Extra$withCmds,
-					_List_fromArray(
-						[cmd, cmd2]),
-					model2));
-		}
-	});
-var author$project$Main$appTrampoline = F4(
-	function (genericMessage, funnel, state, model) {
-		var gmPort = A2(author$project$Main$getGMCmdPort, genericMessage, model);
-		if (funnel.$ === 'EchoFunnel') {
-			var echoFunnel = funnel.a;
-			return A5(author$project$PortFunnel$appProcess, author$project$Main$cmdPort, genericMessage, echoFunnel, state, model);
-		} else {
-			var addFunnel = funnel.a;
-			return A5(author$project$PortFunnel$appProcess, author$project$Main$cmdPort, genericMessage, addFunnel, state, model);
-		}
-	});
-var author$project$Main$AddXYFunnel = function (a) {
-	return {$: 'AddXYFunnel', a: a};
-};
-var author$project$Main$EchoFunnel = function (a) {
-	return {$: 'EchoFunnel', a: a};
-};
-var author$project$PortFunnel$AddXY$toString = function (message) {
-	switch (message.$) {
-		case 'AddMessage':
-			var x = message.a.x;
-			var y = message.a.y;
-			return elm$core$String$fromInt(x) + (' + ' + elm$core$String$fromInt(y));
-		case 'SumMessage':
-			var x = message.a.x;
-			var y = message.a.y;
-			var result = message.a.result;
-			return elm$core$String$fromInt(x) + (' + ' + (elm$core$String$fromInt(y) + (' = ' + elm$core$String$fromInt(result))));
-		case 'MultiplyMessage':
-			var x = message.a.x;
-			var y = message.a.y;
-			return elm$core$String$fromInt(x) + (' + ' + elm$core$String$fromInt(y));
-		default:
-			var x = message.a.x;
-			var y = message.a.y;
-			var result = message.a.result;
-			return elm$core$String$fromInt(x) + (' * ' + (elm$core$String$fromInt(y) + (' = ' + elm$core$String$fromInt(result))));
-	}
-};
-var author$project$Main$addXYHandler = F3(
-	function (response, state, model) {
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{
-					state: state,
-					sums: function () {
-						if (response.$ === 'MessageResponse') {
-							var message = response.a;
-							return A2(
-								elm$core$List$cons,
-								author$project$PortFunnel$AddXY$toString(message),
-								model.sums);
-						} else {
-							return model.sums;
-						}
-					}()
-				}),
-			elm$core$Platform$Cmd$none);
-	});
-var author$project$PortFunnel$StateAccessors = F2(
-	function (get, set) {
-		return {get: get, set: set};
-	});
-var author$project$Main$addxyAccessors = A2(
-	author$project$PortFunnel$StateAccessors,
-	function ($) {
-		return $.addxy;
-	},
-	F2(
-		function (substate, state) {
-			return _Utils_update(
-				state,
-				{addxy: substate});
-		}));
-var author$project$Main$echoAccessors = A2(
-	author$project$PortFunnel$StateAccessors,
-	function ($) {
-		return $.echo;
-	},
-	F2(
-		function (substate, state) {
-			return _Utils_update(
-				state,
-				{echo: substate});
-		}));
-var author$project$PortFunnel$Echo$isLoaded = function (_n0) {
-	var state = _n0.a;
-	return state.isLoaded;
-};
-var elm$core$Basics$not = _Basics_not;
-var author$project$Main$doIsLoaded = function (model) {
-	return ((!model.wasLoaded) && author$project$PortFunnel$Echo$isLoaded(model.state.echo)) ? _Utils_update(
-		model,
-		{useSimulator: false, wasLoaded: true}) : model;
-};
-var elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
-		}
-	});
-var author$project$PortFunnel$Echo$findMessages = function (responses) {
-	return A3(
-		elm$core$List$foldr,
-		F2(
-			function (response, res) {
-				switch (response.$) {
-					case 'MessageResponse':
-						var message = response.a;
-						return A2(elm$core$List$cons, message, res);
-					case 'ListResponse':
-						var resps = response.a;
-						return A2(
-							elm$core$List$append,
-							author$project$PortFunnel$Echo$findMessages(resps),
-							res);
-					default:
-						return res;
-				}
-			}),
-		_List_Nil,
-		responses);
-};
-var author$project$PortFunnel$Echo$toString = function (message) {
-	if (message.$ === 'Request') {
-		var string = message.a;
-		return string;
-	} else {
-		return '<Startup>';
-	}
-};
-var elm$core$List$concat = function (lists) {
-	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
-};
-var author$project$Main$echoHandler = F3(
-	function (response, state, model) {
-		var wasLoaded = model.wasLoaded;
-		var model2 = author$project$Main$doIsLoaded(
-			_Utils_update(
-				model,
-				{
-					echoed: function () {
-						switch (response.$) {
-							case 'MessageResponse':
-								var message = response.a;
-								return A2(
-									elm$core$List$cons,
-									author$project$PortFunnel$Echo$toString(message),
-									model.echoed);
-							case 'ListResponse':
-								var responses = response.a;
-								return elm$core$List$concat(
-									_List_fromArray(
-										[
-											A2(
-											elm$core$List$map,
-											author$project$PortFunnel$Echo$toString,
-											author$project$PortFunnel$Echo$findMessages(responses)),
-											model.echoed
-										]));
-							default:
-								return model.echoed;
-						}
-					}(),
-					state: state
-				}));
-		var cmd = (wasLoaded || (!model2.wasLoaded)) ? elm$core$Platform$Cmd$none : A2(
-			author$project$PortFunnel$Echo$send,
-			author$project$Main$cmdPort,
-			author$project$PortFunnel$Echo$makeMessage('This should happen second.'));
-		return _Utils_Tuple2(model2, cmd);
-	});
-var author$project$PortFunnel$FunnelSpec = F4(
-	function (accessors, moduleDesc, commander, handler) {
-		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
-	});
-var author$project$PortFunnel$emptyCommander = F2(
-	function (_n0, _n1) {
-		return elm$core$Platform$Cmd$none;
-	});
-var author$project$PortFunnel$AddXY$commander = author$project$PortFunnel$emptyCommander;
-var author$project$PortFunnel$Echo$commander = F2(
-	function (gfPort, response) {
-		switch (response.$) {
-			case 'CmdResponse':
-				var message = response.a;
-				return gfPort(
-					author$project$PortFunnel$Echo$encode(message));
-			case 'ListResponse':
-				var messages = response.a;
-				return A3(
-					elm$core$List$foldl,
-					F2(
-						function (resp, cmds) {
-							return elm$core$Platform$Cmd$batch(
-								_List_fromArray(
-									[
-										A2(author$project$PortFunnel$Echo$commander, gfPort, resp),
-										cmds
-									]));
-						}),
-					elm$core$Platform$Cmd$none,
-					messages);
-			default:
-				return elm$core$Platform$Cmd$none;
-		}
-	});
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Dict$Black = {$: 'Black'};
@@ -5795,35 +5483,13 @@ var elm$core$Dict$fromList = function (assocs) {
 		elm$core$Dict$empty,
 		assocs);
 };
-var author$project$Main$funnels = elm$core$Dict$fromList(
+var author$project$PortFunnels$simulatedPortDict = elm$core$Dict$fromList(
 	_List_fromArray(
 		[
-			_Utils_Tuple2(
-			author$project$PortFunnel$Echo$moduleName,
-			author$project$Main$EchoFunnel(
-				A4(author$project$PortFunnel$FunnelSpec, author$project$Main$echoAccessors, author$project$PortFunnel$Echo$moduleDesc, author$project$PortFunnel$Echo$commander, author$project$Main$echoHandler))),
-			_Utils_Tuple2(
-			author$project$PortFunnel$AddXY$moduleName,
-			author$project$Main$AddXYFunnel(
-				A4(author$project$PortFunnel$FunnelSpec, author$project$Main$addxyAccessors, author$project$PortFunnel$AddXY$moduleDesc, author$project$PortFunnel$AddXY$commander, author$project$Main$addXYHandler)))
+			_Utils_Tuple2(author$project$PortFunnel$Echo$moduleName, author$project$PortFunnel$Echo$makeSimulatedCmdPort),
+			_Utils_Tuple2(author$project$PortFunnel$AddXY$moduleName, author$project$PortFunnel$AddXY$makeSimulatedCmdPort)
 		]));
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var elm$core$String$toInt = _String_toInt;
-var author$project$Main$toInt = F2(
-	function (_default, string) {
-		return A2(
-			elm$core$Maybe$withDefault,
-			_default,
-			elm$core$String$toInt(string));
-	});
+var elm$core$Basics$not = _Basics_not;
 var elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -5855,6 +5521,322 @@ var elm$core$Dict$get = F2(
 			}
 		}
 	});
+var author$project$PortFunnels$getCmdPort = F3(
+	function (tagger, moduleName, useSimulator) {
+		if (!useSimulator) {
+			return author$project$PortFunnels$cmdPort;
+		} else {
+			var _n0 = A2(elm$core$Dict$get, moduleName, author$project$PortFunnels$simulatedPortDict);
+			if (_n0.$ === 'Just') {
+				var makeSimulatedCmdPort = _n0.a;
+				return makeSimulatedCmdPort(tagger);
+			} else {
+				return author$project$PortFunnels$cmdPort;
+			}
+		}
+	});
+var author$project$Main$cmdPort = A3(author$project$PortFunnels$getCmdPort, author$project$Main$Process, '', false);
+var author$project$PortFunnel$Echo$makeMessage = function (string) {
+	return author$project$PortFunnel$Echo$Request(string);
+};
+var author$project$PortFunnel$messageToValue = F2(
+	function (_n0, message) {
+		var moduleDesc = _n0.a;
+		return author$project$PortFunnel$encodeGenericMessage(
+			moduleDesc.encoder(message));
+	});
+var author$project$PortFunnel$sendMessage = F3(
+	function (moduleDesc, cmdPort, message) {
+		return cmdPort(
+			A2(author$project$PortFunnel$messageToValue, moduleDesc, message));
+	});
+var author$project$PortFunnel$Echo$send = author$project$PortFunnel$sendMessage(author$project$PortFunnel$Echo$moduleDesc);
+var author$project$PortFunnel$AddXY$initialState = _List_Nil;
+var author$project$PortFunnel$Echo$initialState = author$project$PortFunnel$Echo$State(
+	{isLoaded: false, messages: _List_Nil});
+var author$project$PortFunnels$initialState = {addxy: author$project$PortFunnel$AddXY$initialState, echo: author$project$PortFunnel$Echo$initialState};
+var author$project$Main$init = function (_n0) {
+	return _Utils_Tuple2(
+		{echo: 'foo', echoed: _List_Nil, error: elm$core$Maybe$Nothing, state: author$project$PortFunnels$initialState, sums: _List_Nil, useSimulator: true, wasLoaded: false, x: '2', y: '3'},
+		A2(
+			author$project$PortFunnel$Echo$send,
+			author$project$Main$cmdPort,
+			author$project$PortFunnel$Echo$makeMessage('If you see this, startup queueing is working.')));
+};
+var author$project$PortFunnels$subPort = _Platform_incomingPort('subPort', elm$json$Json$Decode$value);
+var author$project$PortFunnels$subscriptions = F2(
+	function (process, model) {
+		return author$project$PortFunnels$subPort(process);
+	});
+var author$project$Main$subscriptions = author$project$PortFunnels$subscriptions(author$project$Main$Process);
+var Janiczek$cmd_extra$Cmd$Extra$withCmd = F2(
+	function (cmd, model) {
+		return _Utils_Tuple2(model, cmd);
+	});
+var Janiczek$cmd_extra$Cmd$Extra$withNoCmd = function (model) {
+	return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+};
+var author$project$PortFunnel$AddXY$toString = function (message) {
+	switch (message.$) {
+		case 'AddMessage':
+			var x = message.a.x;
+			var y = message.a.y;
+			return elm$core$String$fromInt(x) + (' + ' + elm$core$String$fromInt(y));
+		case 'SumMessage':
+			var x = message.a.x;
+			var y = message.a.y;
+			var result = message.a.result;
+			return elm$core$String$fromInt(x) + (' + ' + (elm$core$String$fromInt(y) + (' = ' + elm$core$String$fromInt(result))));
+		case 'MultiplyMessage':
+			var x = message.a.x;
+			var y = message.a.y;
+			return elm$core$String$fromInt(x) + (' + ' + elm$core$String$fromInt(y));
+		default:
+			var x = message.a.x;
+			var y = message.a.y;
+			var result = message.a.result;
+			return elm$core$String$fromInt(x) + (' * ' + (elm$core$String$fromInt(y) + (' = ' + elm$core$String$fromInt(result))));
+	}
+};
+var author$project$Main$addXYHandler = F3(
+	function (response, state, model) {
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					state: state,
+					sums: function () {
+						if (response.$ === 'MessageResponse') {
+							var message = response.a;
+							return A2(
+								elm$core$List$cons,
+								author$project$PortFunnel$AddXY$toString(message),
+								model.sums);
+						} else {
+							return model.sums;
+						}
+					}()
+				}),
+			elm$core$Platform$Cmd$none);
+	});
+var author$project$PortFunnel$Echo$isLoaded = function (_n0) {
+	var state = _n0.a;
+	return state.isLoaded;
+};
+var author$project$Main$doIsLoaded = function (model) {
+	return ((!model.wasLoaded) && author$project$PortFunnel$Echo$isLoaded(model.state.echo)) ? _Utils_update(
+		model,
+		{useSimulator: false, wasLoaded: true}) : model;
+};
+var elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
+		}
+	});
+var author$project$PortFunnel$Echo$findMessages = function (responses) {
+	return A3(
+		elm$core$List$foldr,
+		F2(
+			function (response, res) {
+				switch (response.$) {
+					case 'MessageResponse':
+						var message = response.a;
+						return A2(elm$core$List$cons, message, res);
+					case 'ListResponse':
+						var resps = response.a;
+						return A2(
+							elm$core$List$append,
+							author$project$PortFunnel$Echo$findMessages(resps),
+							res);
+					default:
+						return res;
+				}
+			}),
+		_List_Nil,
+		responses);
+};
+var author$project$PortFunnel$Echo$toString = function (message) {
+	if (message.$ === 'Request') {
+		var string = message.a;
+		return string;
+	} else {
+		return '<Startup>';
+	}
+};
+var elm$core$List$concat = function (lists) {
+	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
+};
+var author$project$Main$echoHandler = F3(
+	function (response, state, model) {
+		var wasLoaded = model.wasLoaded;
+		var model2 = author$project$Main$doIsLoaded(
+			_Utils_update(
+				model,
+				{
+					echoed: function () {
+						switch (response.$) {
+							case 'MessageResponse':
+								var message = response.a;
+								return A2(
+									elm$core$List$cons,
+									author$project$PortFunnel$Echo$toString(message),
+									model.echoed);
+							case 'ListResponse':
+								var responses = response.a;
+								return elm$core$List$concat(
+									_List_fromArray(
+										[
+											A2(
+											elm$core$List$map,
+											author$project$PortFunnel$Echo$toString,
+											author$project$PortFunnel$Echo$findMessages(responses)),
+											model.echoed
+										]));
+							default:
+								return model.echoed;
+						}
+					}(),
+					state: state
+				}));
+		var cmd = (wasLoaded || (!model2.wasLoaded)) ? elm$core$Platform$Cmd$none : A2(
+			author$project$PortFunnel$Echo$send,
+			author$project$Main$cmdPort,
+			author$project$PortFunnel$Echo$makeMessage('This should happen second.'));
+		return _Utils_Tuple2(model2, cmd);
+	});
+var author$project$PortFunnels$AddXYHandler = function (a) {
+	return {$: 'AddXYHandler', a: a};
+};
+var author$project$PortFunnels$EchoHandler = function (a) {
+	return {$: 'EchoHandler', a: a};
+};
+var author$project$Main$handlers = _List_fromArray(
+	[
+		author$project$PortFunnels$EchoHandler(author$project$Main$echoHandler),
+		author$project$PortFunnels$AddXYHandler(author$project$Main$addXYHandler)
+	]);
+var author$project$PortFunnel$FunnelSpec = F4(
+	function (accessors, moduleDesc, commander, handler) {
+		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
+	});
+var author$project$PortFunnel$emptyCommander = F2(
+	function (_n0, _n1) {
+		return elm$core$Platform$Cmd$none;
+	});
+var author$project$PortFunnel$AddXY$commander = author$project$PortFunnel$emptyCommander;
+var author$project$PortFunnel$Echo$commander = F2(
+	function (gfPort, response) {
+		switch (response.$) {
+			case 'CmdResponse':
+				var message = response.a;
+				return gfPort(
+					author$project$PortFunnel$Echo$encode(message));
+			case 'ListResponse':
+				var messages = response.a;
+				return A3(
+					elm$core$List$foldl,
+					F2(
+						function (resp, cmds) {
+							return elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[
+										A2(author$project$PortFunnel$Echo$commander, gfPort, resp),
+										cmds
+									]));
+						}),
+					elm$core$Platform$Cmd$none,
+					messages);
+			default:
+				return elm$core$Platform$Cmd$none;
+		}
+	});
+var author$project$PortFunnels$AddXYFunnel = function (a) {
+	return {$: 'AddXYFunnel', a: a};
+};
+var author$project$PortFunnels$EchoFunnel = function (a) {
+	return {$: 'EchoFunnel', a: a};
+};
+var author$project$PortFunnel$StateAccessors = F2(
+	function (get, set) {
+		return {get: get, set: set};
+	});
+var author$project$PortFunnels$addXYAccessors = A2(
+	author$project$PortFunnel$StateAccessors,
+	function ($) {
+		return $.addxy;
+	},
+	F2(
+		function (substate, state) {
+			return _Utils_update(
+				state,
+				{addxy: substate});
+		}));
+var author$project$PortFunnels$echoAccessors = A2(
+	author$project$PortFunnel$StateAccessors,
+	function ($) {
+		return $.echo;
+	},
+	F2(
+		function (substate, state) {
+			return _Utils_update(
+				state,
+				{echo: substate});
+		}));
+var author$project$PortFunnels$handlerToFunnel = function (handler) {
+	if (handler.$ === 'EchoHandler') {
+		var echoHandler = handler.a;
+		return _Utils_Tuple2(
+			author$project$PortFunnel$Echo$moduleName,
+			author$project$PortFunnels$EchoFunnel(
+				A4(author$project$PortFunnel$FunnelSpec, author$project$PortFunnels$echoAccessors, author$project$PortFunnel$Echo$moduleDesc, author$project$PortFunnel$Echo$commander, echoHandler)));
+	} else {
+		var echoHandler = handler.a;
+		return _Utils_Tuple2(
+			author$project$PortFunnel$AddXY$moduleName,
+			author$project$PortFunnels$AddXYFunnel(
+				A4(author$project$PortFunnel$FunnelSpec, author$project$PortFunnels$addXYAccessors, author$project$PortFunnel$AddXY$moduleDesc, author$project$PortFunnel$AddXY$commander, echoHandler)));
+	}
+};
+var author$project$PortFunnels$makeFunnelDict = function (handlers) {
+	return elm$core$Dict$fromList(
+		A2(elm$core$List$map, author$project$PortFunnels$handlerToFunnel, handlers));
+};
+var author$project$Main$funnelDict = author$project$PortFunnels$makeFunnelDict(author$project$Main$handlers);
+var author$project$Main$getCmdPort = F2(
+	function (moduleName, model) {
+		return A3(author$project$PortFunnels$getCmdPort, author$project$Main$Process, moduleName, model.useSimulator);
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var elm$core$String$toInt = _String_toInt;
+var author$project$Main$toInt = F2(
+	function (_default, string) {
+		return A2(
+			elm$core$Maybe$withDefault,
+			_default,
+			elm$core$String$toInt(string));
+	});
+var author$project$PortFunnel$AddXY$makeAddMessage = F2(
+	function (x, y) {
+		return author$project$PortFunnel$AddXY$AddMessage(
+			{x: x, y: y});
+	});
+var author$project$PortFunnel$AddXY$makeMultiplyMessage = F2(
+	function (x, y) {
+		return author$project$PortFunnel$AddXY$MultiplyMessage(
+			{x: x, y: y});
+	});
+var author$project$PortFunnel$AddXY$send = author$project$PortFunnel$sendMessage(author$project$PortFunnel$AddXY$moduleDesc);
 var author$project$PortFunnel$processValue = F5(
 	function (funnels, appTrampoline, value, state, model) {
 		var _n0 = author$project$PortFunnel$decodeGenericMessage(value);
@@ -5883,23 +5865,77 @@ var author$project$PortFunnel$processValue = F5(
 			}
 		}
 	});
-var author$project$PortFunnel$AddXY$makeAddMessage = F2(
-	function (x, y) {
-		return author$project$PortFunnel$AddXY$AddMessage(
-			{x: x, y: y});
+var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
+	function (cmds, model) {
+		return _Utils_Tuple2(
+			model,
+			elm$core$Platform$Cmd$batch(cmds));
 	});
-var author$project$PortFunnel$AddXY$makeMultiplyMessage = F2(
-	function (x, y) {
-		return author$project$PortFunnel$AddXY$MultiplyMessage(
-			{x: x, y: y});
+var author$project$PortFunnel$process = F4(
+	function (accessors, _n0, genericMessage, state) {
+		var moduleDesc = _n0.a;
+		var _n1 = moduleDesc.decoder(genericMessage);
+		if (_n1.$ === 'Err') {
+			var err = _n1.a;
+			return elm$core$Result$Err(err);
+		} else {
+			var message = _n1.a;
+			var substate = accessors.get(state);
+			var _n2 = A2(moduleDesc.process, message, substate);
+			var substate2 = _n2.a;
+			var response = _n2.b;
+			return elm$core$Result$Ok(
+				_Utils_Tuple2(
+					A2(accessors.set, substate2, state),
+					response));
+		}
 	});
-var author$project$PortFunnel$AddXY$send = author$project$PortFunnel$sendMessage(author$project$PortFunnel$AddXY$moduleDesc);
+var author$project$PortFunnel$appProcess = F5(
+	function (cmdPort, genericMessage, funnel, state, model) {
+		var _n0 = A4(author$project$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
+		if (_n0.$ === 'Err') {
+			var error = _n0.a;
+			return elm$core$Result$Err(error);
+		} else {
+			var _n1 = _n0.a;
+			var state2 = _n1.a;
+			var response = _n1.b;
+			var gmToCmdPort = function (gm) {
+				return cmdPort(
+					author$project$PortFunnel$encodeGenericMessage(gm));
+			};
+			var cmd = A2(funnel.commander, gmToCmdPort, response);
+			var _n2 = A3(funnel.handler, response, state2, model);
+			var model2 = _n2.a;
+			var cmd2 = _n2.b;
+			return elm$core$Result$Ok(
+				A2(
+					Janiczek$cmd_extra$Cmd$Extra$withCmds,
+					_List_fromArray(
+						[cmd, cmd2]),
+					model2));
+		}
+	});
+var author$project$PortFunnels$appTrampoline = F4(
+	function (genericMessage, funnel, state, model) {
+		if (funnel.$ === 'EchoFunnel') {
+			var appFunnel = funnel.a;
+			return A5(author$project$PortFunnel$appProcess, author$project$PortFunnels$cmdPort, genericMessage, appFunnel, state, model);
+		} else {
+			var appFunnel = funnel.a;
+			return A5(author$project$PortFunnel$appProcess, author$project$PortFunnels$cmdPort, genericMessage, appFunnel, state, model);
+		}
+	});
+var author$project$PortFunnels$processValue = F4(
+	function (funnelDict, value, state, model) {
+		return A5(author$project$PortFunnel$processValue, funnelDict, author$project$PortFunnels$appTrampoline, value, state, model);
+	});
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Process':
 				var value = msg.a;
-				var _n1 = A5(author$project$PortFunnel$processValue, author$project$Main$funnels, author$project$Main$appTrampoline, value, model.state, model);
+				var _n1 = A4(author$project$PortFunnels$processValue, author$project$Main$funnelDict, value, model.state, model);
 				if (_n1.$ === 'Err') {
 					var error = _n1.a;
 					return _Utils_Tuple2(
@@ -5942,7 +5978,7 @@ var author$project$Main$update = F2(
 					Janiczek$cmd_extra$Cmd$Extra$withCmd,
 					A2(
 						author$project$PortFunnel$AddXY$send,
-						author$project$Main$getAddXYCmdPort(model),
+						A2(author$project$Main$getCmdPort, author$project$PortFunnel$AddXY$moduleName, model),
 						A2(
 							author$project$PortFunnel$AddXY$makeAddMessage,
 							A2(author$project$Main$toInt, 0, model.x),
@@ -5953,7 +5989,7 @@ var author$project$Main$update = F2(
 					Janiczek$cmd_extra$Cmd$Extra$withCmd,
 					A2(
 						author$project$PortFunnel$AddXY$send,
-						author$project$Main$getAddXYCmdPort(model),
+						A2(author$project$Main$getCmdPort, author$project$PortFunnel$AddXY$moduleName, model),
 						A2(
 							author$project$PortFunnel$AddXY$makeMultiplyMessage,
 							A2(author$project$Main$toInt, 0, model.x),
@@ -5964,7 +6000,7 @@ var author$project$Main$update = F2(
 					Janiczek$cmd_extra$Cmd$Extra$withCmd,
 					A2(
 						author$project$PortFunnel$Echo$send,
-						author$project$Main$getEchoCmdPort(model),
+						A2(author$project$Main$getCmdPort, author$project$PortFunnel$Echo$moduleName, model),
 						author$project$PortFunnel$Echo$makeMessage(model.echo)),
 					model);
 		}
