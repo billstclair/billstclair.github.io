@@ -5576,6 +5576,10 @@ var Janiczek$cmd_extra$Cmd$Extra$withCmd = F2(
 var Janiczek$cmd_extra$Cmd$Extra$withNoCmd = function (model) {
 	return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 };
+var author$project$Main$getCmdPort = F2(
+	function (moduleName, model) {
+		return A3(author$project$PortFunnels$getCmdPort, author$project$Main$Process, moduleName, model.useSimulator);
+	});
 var author$project$PortFunnel$AddXY$toString = function (message) {
 	switch (message.$) {
 		case 'AddMessage':
@@ -5800,15 +5804,14 @@ var author$project$PortFunnels$handlerToFunnel = function (handler) {
 				A4(author$project$PortFunnel$FunnelSpec, author$project$PortFunnels$addXYAccessors, author$project$PortFunnel$AddXY$moduleDesc, author$project$PortFunnel$AddXY$commander, echoHandler)));
 	}
 };
-var author$project$PortFunnels$makeFunnelDict = function (handlers) {
-	return elm$core$Dict$fromList(
-		A2(elm$core$List$map, author$project$PortFunnels$handlerToFunnel, handlers));
-};
-var author$project$Main$funnelDict = author$project$PortFunnels$makeFunnelDict(author$project$Main$handlers);
-var author$project$Main$getCmdPort = F2(
-	function (moduleName, model) {
-		return A3(author$project$PortFunnels$getCmdPort, author$project$Main$Process, moduleName, model.useSimulator);
+var author$project$PortFunnels$makeFunnelDict = F2(
+	function (handlers, portGetter) {
+		return _Utils_Tuple2(
+			elm$core$Dict$fromList(
+				A2(elm$core$List$map, author$project$PortFunnels$handlerToFunnel, handlers)),
+			portGetter);
 	});
+var author$project$Main$funnelDict = A2(author$project$PortFunnels$makeFunnelDict, author$project$Main$handlers, author$project$Main$getCmdPort);
 var elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5916,19 +5919,39 @@ var author$project$PortFunnel$appProcess = F5(
 					model2));
 		}
 	});
-var author$project$PortFunnels$appTrampoline = F4(
-	function (genericMessage, funnel, state, model) {
+var author$project$PortFunnels$appTrampoline = F5(
+	function (portGetter, genericMessage, funnel, state, model) {
 		if (funnel.$ === 'EchoFunnel') {
 			var appFunnel = funnel.a;
-			return A5(author$project$PortFunnel$appProcess, author$project$PortFunnels$cmdPort, genericMessage, appFunnel, state, model);
+			return A5(
+				author$project$PortFunnel$appProcess,
+				A2(portGetter, author$project$PortFunnel$Echo$moduleName, model),
+				genericMessage,
+				appFunnel,
+				state,
+				model);
 		} else {
 			var appFunnel = funnel.a;
-			return A5(author$project$PortFunnel$appProcess, author$project$PortFunnels$cmdPort, genericMessage, appFunnel, state, model);
+			return A5(
+				author$project$PortFunnel$appProcess,
+				A2(portGetter, author$project$PortFunnel$AddXY$moduleName, model),
+				genericMessage,
+				appFunnel,
+				state,
+				model);
 		}
 	});
 var author$project$PortFunnels$processValue = F4(
-	function (funnelDict, value, state, model) {
-		return A5(author$project$PortFunnel$processValue, funnelDict, author$project$PortFunnels$appTrampoline, value, state, model);
+	function (_n0, value, state, model) {
+		var funnelDict = _n0.a;
+		var portGetter = _n0.b;
+		return A5(
+			author$project$PortFunnel$processValue,
+			funnelDict,
+			author$project$PortFunnels$appTrampoline(portGetter),
+			value,
+			state,
+			model);
 	});
 var author$project$Main$update = F2(
 	function (msg, model) {
