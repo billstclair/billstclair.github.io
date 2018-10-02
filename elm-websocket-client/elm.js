@@ -4780,24 +4780,26 @@ var elm$core$Set$Set_elm_builtin = function (a) {
 var elm$core$Set$empty = elm$core$Set$Set_elm_builtin(elm$core$Dict$empty);
 var author$project$PortFunnel$WebSocket$initialState = author$project$PortFunnel$WebSocket$State(
 	{continuationCounter: 0, continuations: elm$core$Dict$empty, isLoaded: false, noAutoReopenKeys: elm$core$Set$empty, queues: elm$core$Dict$empty, socketStates: elm$core$Dict$empty});
-var author$project$Main$initialFunnelState = {socket: author$project$PortFunnel$WebSocket$initialState};
+var author$project$PortFunnels$initialState = {websocket: author$project$PortFunnel$WebSocket$initialState};
 var author$project$Main$init = function (_n0) {
 	return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
-		{error: elm$core$Maybe$Nothing, key: 'socket', log: _List_Nil, send: 'Hello World!', state: author$project$Main$initialFunnelState, url: author$project$Main$defaultUrl, useSimulator: true, wasLoaded: false});
+		{error: elm$core$Maybe$Nothing, key: 'socket', log: _List_Nil, send: 'Hello World!', state: author$project$PortFunnels$initialState, url: author$project$Main$defaultUrl, useSimulator: true, wasLoaded: false});
 };
 var author$project$Main$Process = function (a) {
 	return {$: 'Process', a: a};
 };
 var elm$json$Json$Decode$value = _Json_decodeValue;
-var author$project$Main$subPort = _Platform_incomingPort('subPort', elm$json$Json$Decode$value);
-var author$project$Main$subscriptions = function (model) {
-	return author$project$Main$subPort(author$project$Main$Process);
-};
+var author$project$PortFunnels$subPort = _Platform_incomingPort('subPort', elm$json$Json$Decode$value);
+var author$project$PortFunnels$subscriptions = F2(
+	function (process, model) {
+		return author$project$PortFunnels$subPort(process);
+	});
+var author$project$Main$subscriptions = author$project$PortFunnels$subscriptions(author$project$Main$Process);
 var Janiczek$cmd_extra$Cmd$Extra$withCmd = F2(
 	function (cmd, model) {
 		return _Utils_Tuple2(model, cmd);
 	});
-var author$project$Main$cmdPort = _Platform_outgoingPort('cmdPort', elm$core$Basics$identity);
+var author$project$PortFunnels$cmdPort = _Platform_outgoingPort('cmdPort', elm$core$Basics$identity);
 var elm$json$Json$Decode$map2 = _Json_map2;
 var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = elm$json$Json$Decode$map2(elm$core$Basics$apR);
 var elm$json$Json$Decode$andThen = _Json_andThen;
@@ -6968,85 +6970,29 @@ var billstclair$elm_port_funnel$PortFunnel$makeSimulatedFunnelCmdPort = F4(
 		}
 	});
 var author$project$PortFunnel$WebSocket$makeSimulatedCmdPort = A2(billstclair$elm_port_funnel$PortFunnel$makeSimulatedFunnelCmdPort, author$project$PortFunnel$WebSocket$moduleDesc, author$project$PortFunnel$WebSocket$simulator);
-var author$project$Main$simulatedCmdPort = author$project$PortFunnel$WebSocket$makeSimulatedCmdPort(author$project$Main$Process);
-var author$project$Main$getCmdPort = function (model) {
-	return model.useSimulator ? author$project$Main$simulatedCmdPort : author$project$Main$cmdPort;
-};
-var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
-	function (cmds, model) {
-		return _Utils_Tuple2(
-			model,
-			elm$core$Platform$Cmd$batch(cmds));
-	});
-var billstclair$elm_port_funnel$PortFunnel$process = F4(
-	function (accessors, _n0, genericMessage, state) {
-		var moduleDesc = _n0.a;
-		var _n1 = moduleDesc.decoder(genericMessage);
-		if (_n1.$ === 'Err') {
-			var err = _n1.a;
-			return elm$core$Result$Err(err);
+var author$project$PortFunnels$simulatedPortDict = elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(author$project$PortFunnel$WebSocket$moduleName, author$project$PortFunnel$WebSocket$makeSimulatedCmdPort)
+		]));
+var author$project$PortFunnels$getCmdPort = F3(
+	function (tagger, moduleName, useSimulator) {
+		if (!useSimulator) {
+			return author$project$PortFunnels$cmdPort;
 		} else {
-			var message = _n1.a;
-			var substate = accessors.get(state);
-			var _n2 = A2(moduleDesc.process, message, substate);
-			var substate2 = _n2.a;
-			var response = _n2.b;
-			return elm$core$Result$Ok(
-				_Utils_Tuple2(
-					A2(accessors.set, substate2, state),
-					response));
+			var _n0 = A2(elm$core$Dict$get, moduleName, author$project$PortFunnels$simulatedPortDict);
+			if (_n0.$ === 'Just') {
+				var makeSimulatedCmdPort = _n0.a;
+				return makeSimulatedCmdPort(tagger);
+			} else {
+				return author$project$PortFunnels$cmdPort;
+			}
 		}
 	});
-var billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
-	function (cmdPort, genericMessage, funnel, state, model) {
-		var _n0 = A4(billstclair$elm_port_funnel$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
-		if (_n0.$ === 'Err') {
-			var error = _n0.a;
-			return elm$core$Result$Err(error);
-		} else {
-			var _n1 = _n0.a;
-			var state2 = _n1.a;
-			var response = _n1.b;
-			var gmToCmdPort = function (gm) {
-				return cmdPort(
-					billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage(gm));
-			};
-			var cmd = A2(funnel.commander, gmToCmdPort, response);
-			var _n2 = A3(funnel.handler, response, state2, model);
-			var model2 = _n2.a;
-			var cmd2 = _n2.b;
-			return elm$core$Result$Ok(
-				A2(
-					Janiczek$cmd_extra$Cmd$Extra$withCmds,
-					_List_fromArray(
-						[cmd, cmd2]),
-					model2));
-		}
+var author$project$Main$getCmdPort = F2(
+	function (moduleName, model) {
+		return A3(author$project$PortFunnels$getCmdPort, author$project$Main$Process, moduleName, model.useSimulator);
 	});
-var author$project$Main$appTrampoline = F4(
-	function (genericMessage, funnel, state, model) {
-		var theCmdPort = author$project$Main$getCmdPort(model);
-		var appFunnel = funnel.a;
-		return A5(billstclair$elm_port_funnel$PortFunnel$appProcess, theCmdPort, genericMessage, appFunnel, state, model);
-	});
-var author$project$Main$SocketFunnel = function (a) {
-	return {$: 'SocketFunnel', a: a};
-};
-var billstclair$elm_port_funnel$PortFunnel$StateAccessors = F2(
-	function (get, set) {
-		return {get: get, set: set};
-	});
-var author$project$Main$socketAccessors = A2(
-	billstclair$elm_port_funnel$PortFunnel$StateAccessors,
-	function ($) {
-		return $.socket;
-	},
-	F2(
-		function (substate, state) {
-			return _Utils_update(
-				state,
-				{socket: substate});
-		}));
 var author$project$PortFunnel$WebSocket$closedCodeToString = function (code) {
 	switch (code.$) {
 		case 'NormalClosure':
@@ -7094,7 +7040,7 @@ var author$project$PortFunnel$WebSocket$isLoaded = function (_n0) {
 	return state.isLoaded;
 };
 var author$project$Main$doIsLoaded = function (model) {
-	return ((!model.wasLoaded) && author$project$PortFunnel$WebSocket$isLoaded(model.state.socket)) ? _Utils_update(
+	return ((!model.wasLoaded) && author$project$PortFunnel$WebSocket$isLoaded(model.state.websocket)) ? _Utils_update(
 		model,
 		{useSimulator: false, wasLoaded: true}) : model;
 };
@@ -7263,6 +7209,13 @@ var author$project$Main$socketHandler = F3(
 				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(model);
 		}
 	});
+var author$project$PortFunnels$WebSocketHandler = function (a) {
+	return {$: 'WebSocketHandler', a: a};
+};
+var author$project$Main$handlers = _List_fromArray(
+	[
+		author$project$PortFunnels$WebSocketHandler(author$project$Main$socketHandler)
+	]);
 var elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -7298,18 +7251,43 @@ var author$project$PortFunnel$WebSocket$commander = F2(
 				return elm$core$Platform$Cmd$none;
 		}
 	});
+var author$project$PortFunnels$WebSocketFunnel = function (a) {
+	return {$: 'WebSocketFunnel', a: a};
+};
+var billstclair$elm_port_funnel$PortFunnel$StateAccessors = F2(
+	function (get, set) {
+		return {get: get, set: set};
+	});
+var author$project$PortFunnels$websocketAccessors = A2(
+	billstclair$elm_port_funnel$PortFunnel$StateAccessors,
+	function ($) {
+		return $.websocket;
+	},
+	F2(
+		function (substate, state) {
+			return _Utils_update(
+				state,
+				{websocket: substate});
+		}));
 var billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
 	function (accessors, moduleDesc, commander, handler) {
 		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
 	});
-var author$project$Main$funnels = elm$core$Dict$fromList(
-	_List_fromArray(
-		[
-			_Utils_Tuple2(
-			author$project$PortFunnel$WebSocket$moduleName,
-			author$project$Main$SocketFunnel(
-				A4(billstclair$elm_port_funnel$PortFunnel$FunnelSpec, author$project$Main$socketAccessors, author$project$PortFunnel$WebSocket$moduleDesc, author$project$PortFunnel$WebSocket$commander, author$project$Main$socketHandler)))
-		]));
+var author$project$PortFunnels$handlerToFunnel = function (handler) {
+	var websocketHandler = handler.a;
+	return _Utils_Tuple2(
+		author$project$PortFunnel$WebSocket$moduleName,
+		author$project$PortFunnels$WebSocketFunnel(
+			A4(billstclair$elm_port_funnel$PortFunnel$FunnelSpec, author$project$PortFunnels$websocketAccessors, author$project$PortFunnel$WebSocket$moduleDesc, author$project$PortFunnel$WebSocket$commander, websocketHandler)));
+};
+var author$project$PortFunnels$makeFunnelDict = F2(
+	function (handlers, portGetter) {
+		return _Utils_Tuple2(
+			elm$core$Dict$fromList(
+				A2(elm$core$List$map, author$project$PortFunnels$handlerToFunnel, handlers)),
+			portGetter);
+	});
+var author$project$Main$funnelDict = A2(author$project$PortFunnels$makeFunnelDict, author$project$Main$handlers, author$project$Main$getCmdPort);
 var billstclair$elm_port_funnel$PortFunnel$messageToValue = F2(
 	function (_n0, message) {
 		var moduleDesc = _n0.a;
@@ -7326,7 +7304,7 @@ var author$project$Main$send = F2(
 	function (model, message) {
 		return A2(
 			author$project$PortFunnel$WebSocket$send,
-			author$project$Main$getCmdPort(model),
+			A2(author$project$Main$getCmdPort, author$project$PortFunnel$WebSocket$moduleName, model),
 			message);
 	});
 var author$project$PortFunnel$WebSocket$makeClose = function (key) {
@@ -7369,6 +7347,68 @@ var author$project$PortFunnel$WebSocket$willAutoReopen = F2(
 		var state = _n0.a;
 		return !A2(elm$core$Set$member, key, state.noAutoReopenKeys);
 	});
+var Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
+	function (cmds, model) {
+		return _Utils_Tuple2(
+			model,
+			elm$core$Platform$Cmd$batch(cmds));
+	});
+var billstclair$elm_port_funnel$PortFunnel$process = F4(
+	function (accessors, _n0, genericMessage, state) {
+		var moduleDesc = _n0.a;
+		var _n1 = moduleDesc.decoder(genericMessage);
+		if (_n1.$ === 'Err') {
+			var err = _n1.a;
+			return elm$core$Result$Err(err);
+		} else {
+			var message = _n1.a;
+			var substate = accessors.get(state);
+			var _n2 = A2(moduleDesc.process, message, substate);
+			var substate2 = _n2.a;
+			var response = _n2.b;
+			return elm$core$Result$Ok(
+				_Utils_Tuple2(
+					A2(accessors.set, substate2, state),
+					response));
+		}
+	});
+var billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
+	function (cmdPort, genericMessage, funnel, state, model) {
+		var _n0 = A4(billstclair$elm_port_funnel$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
+		if (_n0.$ === 'Err') {
+			var error = _n0.a;
+			return elm$core$Result$Err(error);
+		} else {
+			var _n1 = _n0.a;
+			var state2 = _n1.a;
+			var response = _n1.b;
+			var gmToCmdPort = function (gm) {
+				return cmdPort(
+					billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage(gm));
+			};
+			var cmd = A2(funnel.commander, gmToCmdPort, response);
+			var _n2 = A3(funnel.handler, response, state2, model);
+			var model2 = _n2.a;
+			var cmd2 = _n2.b;
+			return elm$core$Result$Ok(
+				A2(
+					Janiczek$cmd_extra$Cmd$Extra$withCmds,
+					_List_fromArray(
+						[cmd, cmd2]),
+					model2));
+		}
+	});
+var author$project$PortFunnels$appTrampoline = F5(
+	function (portGetter, genericMessage, funnel, state, model) {
+		var appFunnel = funnel.a;
+		return A5(
+			billstclair$elm_port_funnel$PortFunnel$appProcess,
+			A2(portGetter, author$project$PortFunnel$WebSocket$moduleName, model),
+			genericMessage,
+			appFunnel,
+			state,
+			model);
+	});
 var billstclair$elm_port_funnel$PortFunnel$processValue = F5(
 	function (funnels, appTrampoline, value, state, model) {
 		var _n0 = billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage(value);
@@ -7397,6 +7437,18 @@ var billstclair$elm_port_funnel$PortFunnel$processValue = F5(
 			}
 		}
 	});
+var author$project$PortFunnels$processValue = F4(
+	function (_n0, value, state, model) {
+		var funnelDict = _n0.a;
+		var portGetter = _n0.b;
+		return A5(
+			billstclair$elm_port_funnel$PortFunnel$processValue,
+			funnelDict,
+			author$project$PortFunnels$appTrampoline(portGetter),
+			value,
+			state,
+			model);
+	});
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7419,7 +7471,7 @@ var author$project$Main$update = F2(
 						{useSimulator: !model.useSimulator}));
 			case 'ToggleAutoReopen':
 				var state = model.state;
-				var socketState = state.socket;
+				var socketState = state.websocket;
 				var autoReopen = A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, socketState);
 				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
 					_Utils_update(
@@ -7428,7 +7480,7 @@ var author$project$Main$update = F2(
 							state: _Utils_update(
 								state,
 								{
-									socket: A3(author$project$PortFunnel$WebSocket$setAutoReopen, model.key, !autoReopen, socketState)
+									websocket: A3(author$project$PortFunnel$WebSocket$setAutoReopen, model.key, !autoReopen, socketState)
 								})
 						}));
 			case 'Connect':
@@ -7472,7 +7524,7 @@ var author$project$Main$update = F2(
 						}));
 			default:
 				var value = msg.a;
-				var _n1 = A5(billstclair$elm_port_funnel$PortFunnel$processValue, author$project$Main$funnels, author$project$Main$appTrampoline, value, model.state, model);
+				var _n1 = A4(author$project$PortFunnels$processValue, author$project$Main$funnelDict, value, model.state, model);
 				if (_n1.$ === 'Err') {
 					var error = _n1.a;
 					return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
@@ -7645,7 +7697,7 @@ var elm$html$Html$Events$onInput = function (tagger) {
 			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
 };
 var author$project$Main$view = function (model) {
-	var isConnected = A2(author$project$PortFunnel$WebSocket$isConnected, model.key, model.state.socket);
+	var isConnected = A2(author$project$PortFunnel$WebSocket$isConnected, model.key, model.state.websocket);
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
@@ -7749,7 +7801,7 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$Attributes$type_('checkbox'),
 								elm$html$Html$Events$onClick(author$project$Main$ToggleAutoReopen),
 								elm$html$Html$Attributes$checked(
-								A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, model.state.socket))
+								A2(author$project$PortFunnel$WebSocket$willAutoReopen, model.key, model.state.websocket))
 							]),
 						_List_Nil)
 					])),
