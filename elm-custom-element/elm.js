@@ -5058,6 +5058,7 @@ var elm$html$Html$h2 = _VirtualDom_node('h2');
 var elm$html$Html$img = _VirtualDom_node('img');
 var elm$html$Html$p = _VirtualDom_node('p');
 var elm$html$Html$pre = _VirtualDom_node('pre');
+var elm$html$Html$Attributes$accept = elm$html$Html$Attributes$stringProperty('accept');
 var elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		elm$html$Html$Attributes$stringProperty,
@@ -5368,7 +5369,10 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 						A3(
 						billstclair$elm_custom_element$CustomElement$FileListener$fileInput,
 						'fileid',
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$accept('image/*')
+							]),
 						_List_fromArray(
 							[
 								billstclair$elm_custom_element$CustomElement$FileListener$onLoad(billstclair$elm_custom_element$Main$SetFile)
