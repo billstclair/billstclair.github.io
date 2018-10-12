@@ -5627,6 +5627,9 @@ var author$project$PortFunnel$WebSocket$MessageReceivedResponse = function (a) {
 	return {$: 'MessageReceivedResponse', a: a};
 };
 var author$project$PortFunnel$WebSocket$NoResponse = {$: 'NoResponse'};
+var author$project$PortFunnel$WebSocket$ReconnectedResponse = function (a) {
+	return {$: 'ReconnectedResponse', a: a};
+};
 var author$project$PortFunnel$WebSocket$UnexpectedConnectedError = function (a) {
 	return {$: 'UnexpectedConnectedError', a: a};
 };
@@ -6520,14 +6523,14 @@ var author$project$PortFunnel$WebSocket$DrainOutputQueue = {$: 'DrainOutputQueue
 var author$project$PortFunnel$WebSocket$ListResponse = function (a) {
 	return {$: 'ListResponse', a: a};
 };
-var author$project$PortFunnel$WebSocket$processQueuedMessage = F2(
-	function (state, key) {
+var author$project$PortFunnel$WebSocket$processQueuedMessage = F3(
+	function (state, key, reconnectedResponse) {
 		var queues = state.queues;
 		var _n0 = A2(elm$core$Dict$get, key, queues);
 		if (_n0.$ === 'Nothing') {
 			return _Utils_Tuple2(
 				author$project$PortFunnel$WebSocket$State(state),
-				author$project$PortFunnel$WebSocket$NoResponse);
+				reconnectedResponse);
 		} else {
 			if (!_n0.a.b) {
 				return _Utils_Tuple2(
@@ -6537,7 +6540,7 @@ var author$project$PortFunnel$WebSocket$processQueuedMessage = F2(
 							{
 								queues: A2(elm$core$Dict$remove, key, queues)
 							})),
-					author$project$PortFunnel$WebSocket$NoResponse);
+					reconnectedResponse);
 			} else {
 				var _n1 = _n0.a;
 				var message = _n1.a;
@@ -6550,11 +6553,23 @@ var author$project$PortFunnel$WebSocket$processQueuedMessage = F2(
 				var podelay = author$project$PortFunnel$WebSocket$InternalMessage$PODelay(
 					{id: id, millis: 20});
 				var response = author$project$PortFunnel$WebSocket$ListResponse(
-					_List_fromArray(
-						[
-							author$project$PortFunnel$WebSocket$CmdResponse(podelay),
-							author$project$PortFunnel$WebSocket$CmdResponse(posend)
-						]));
+					elm$core$List$concat(
+						_List_fromArray(
+							[
+								function () {
+								if (reconnectedResponse.$ === 'NoResponse') {
+									return _List_Nil;
+								} else {
+									return _List_fromArray(
+										[reconnectedResponse]);
+								}
+							}(),
+								_List_fromArray(
+								[
+									author$project$PortFunnel$WebSocket$CmdResponse(podelay),
+									author$project$PortFunnel$WebSocket$CmdResponse(posend)
+								])
+							])));
 				return _Utils_Tuple2(
 					author$project$PortFunnel$WebSocket$State(
 						_Utils_update(
@@ -6630,7 +6645,12 @@ var author$project$PortFunnel$WebSocket$process = F2(
 					return (!socketState.backoff) ? _Utils_Tuple2(
 						author$project$PortFunnel$WebSocket$State(newState),
 						author$project$PortFunnel$WebSocket$ConnectedResponse(
-							{description: description, key: key})) : A2(author$project$PortFunnel$WebSocket$processQueuedMessage, newState, key);
+							{description: description, key: key})) : A3(
+						author$project$PortFunnel$WebSocket$processQueuedMessage,
+						newState,
+						key,
+						author$project$PortFunnel$WebSocket$ReconnectedResponse(
+							{description: description, key: key}));
 				}
 			case 'PIMessageReceived':
 				var key = mess.a.key;
@@ -6687,7 +6707,7 @@ var author$project$PortFunnel$WebSocket$process = F2(
 					var kind = _n2.b;
 					var state2 = _n2.c;
 					if (kind.$ === 'DrainOutputQueue') {
-						return A2(author$project$PortFunnel$WebSocket$processQueuedMessage, state2, key);
+						return A3(author$project$PortFunnel$WebSocket$processQueuedMessage, state2, key, author$project$PortFunnel$WebSocket$NoResponse);
 					} else {
 						var socketState = A2(author$project$PortFunnel$WebSocket$getSocketState, key, state);
 						var url = socketState.url;
@@ -7159,6 +7179,37 @@ var author$project$PortFunnel$WebSocket$errorToString = function (theError) {
 			return 'InvalidMessageError: ' + author$project$PortFunnel$WebSocket$toString(message);
 	}
 };
+var author$project$PortFunnel$WebSocket$isReconnectedResponse = function (response) {
+	if (response.$ === 'ReconnectedResponse') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var author$project$PortFunnel$WebSocket$reconnectedResponses = function (response) {
+	switch (response.$) {
+		case 'ReconnectedResponse':
+			return _List_fromArray(
+				[response]);
+		case 'ListResponse':
+			var list = response.a;
+			return A2(elm$core$List$filter, author$project$PortFunnel$WebSocket$isReconnectedResponse, list);
+		default:
+			return _List_Nil;
+	}
+};
+var elm$core$Debug$toString = _Debug_toString;
 var author$project$Main$socketHandler = F3(
 	function (response, state, mdl) {
 		var model = author$project$Main$doIsLoaded(
@@ -7175,11 +7226,12 @@ var author$project$Main$socketHandler = F3(
 							log: A2(elm$core$List$cons, 'Received \"' + (message + '\"'), model.log)
 						}));
 			case 'ConnectedResponse':
+				var r = response.a;
 				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
 					_Utils_update(
 						model,
 						{
-							log: A2(elm$core$List$cons, 'Connected', model.log)
+							log: A2(elm$core$List$cons, 'Connected: ' + r.description, model.log)
 						}));
 			case 'ClosedResponse':
 				var code = response.a.code;
@@ -7206,7 +7258,31 @@ var author$project$Main$socketHandler = F3(
 								model.log)
 						}));
 			default:
-				return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(model);
+				var _n1 = author$project$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_n1.b) {
+					return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(model);
+				} else {
+					if ((_n1.a.$ === 'ReconnectedResponse') && (!_n1.b.b)) {
+						var r = _n1.a.a;
+						return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
+							_Utils_update(
+								model,
+								{
+									log: A2(elm$core$List$cons, 'Reconnected: ' + r.description, model.log)
+								}));
+					} else {
+						var list = _n1;
+						return Janiczek$cmd_extra$Cmd$Extra$withNoCmd(
+							_Utils_update(
+								model,
+								{
+									log: A2(
+										elm$core$List$cons,
+										elm$core$Debug$toString(list),
+										model.log)
+								}));
+					}
+				}
 		}
 	});
 var author$project$PortFunnels$WebSocketHandler = function (a) {
