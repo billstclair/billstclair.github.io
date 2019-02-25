@@ -4805,7 +4805,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var billstclair$elm_custom_element$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{coordinates: elm$core$Maybe$Nothing, file: elm$core$Maybe$Nothing, selection: elm$core$Maybe$Nothing, triggerCoordinates: 0, triggerSelection: 0, value: 'module Main exposing (main)' + ('\n\n' + ('import Html' + ('\n\n' + 'main = Html.text \"Hello, World!\"')))},
+		{coordinates: elm$core$Maybe$Nothing, file: elm$core$Maybe$Nothing, selection: elm$core$Maybe$Nothing, text: 'Four score and seven years ago,\nOur forefathers set forth...', triggerCoordinates: 0, triggerSelection: 0, value: 'module Main exposing (main)' + ('\n\n' + ('import Html' + ('\n\n' + 'main = Html.text \"Hello, World!\"')))},
 		elm$core$Platform$Cmd$none);
 };
 var billstclair$elm_custom_element$Main$update = F2(
@@ -4826,6 +4826,13 @@ var billstclair$elm_custom_element$Main$update = F2(
 					_Utils_update(
 						model,
 						{value: value}),
+					elm$core$Platform$Cmd$none);
+			case 'SetText':
+				var text = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{text: text}),
 					elm$core$Platform$Cmd$none);
 			case 'TriggerCoordinates':
 				return _Utils_Tuple2(
@@ -5163,6 +5170,9 @@ var billstclair$elm_custom_element$Main$Selection = function (a) {
 var billstclair$elm_custom_element$Main$SetFile = function (a) {
 	return {$: 'SetFile', a: a};
 };
+var billstclair$elm_custom_element$Main$SetText = function (a) {
+	return {$: 'SetText', a: a};
+};
 var billstclair$elm_custom_element$Main$TriggerCoordinates = {$: 'TriggerCoordinates'};
 var billstclair$elm_custom_element$Main$TriggerSelection = {$: 'TriggerSelection'};
 var elm$html$Html$b = _VirtualDom_node('b');
@@ -5272,6 +5282,33 @@ var elm$html$Html$Events$onClick = function (msg) {
 		elm$html$Html$Events$on,
 		'click',
 		elm$json$Json$Decode$succeed(msg));
+};
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
 };
 var elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
@@ -5567,9 +5604,13 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 							[
 								elm$html$Html$Attributes$id('textarea'),
 								elm$html$Html$Attributes$rows(10),
-								elm$html$Html$Attributes$cols(80)
+								elm$html$Html$Attributes$cols(80),
+								elm$html$Html$Events$onInput(billstclair$elm_custom_element$Main$SetText)
 							]),
-						_List_Nil),
+						_List_fromArray(
+							[
+								elm$html$Html$text(model.text)
+							])),
 						A2(
 						elm$html$Html$p,
 						_List_Nil,
