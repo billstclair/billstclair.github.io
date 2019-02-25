@@ -4805,27 +4805,58 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var billstclair$elm_custom_element$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{file: elm$core$Maybe$Nothing, value: 'module Main exposing (main)' + ('\n\n' + ('import Html' + ('\n\n' + 'main = Html.text \"Hello, World!\"')))},
+		{coordinates: elm$core$Maybe$Nothing, file: elm$core$Maybe$Nothing, selection: elm$core$Maybe$Nothing, triggerCoordinates: 0, triggerSelection: 0, value: 'module Main exposing (main)' + ('\n\n' + ('import Html' + ('\n\n' + 'main = Html.text \"Hello, World!\"')))},
 		elm$core$Platform$Cmd$none);
 };
 var billstclair$elm_custom_element$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'SetFile') {
-			var file = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						file: elm$core$Maybe$Just(file)
-					}),
-				elm$core$Platform$Cmd$none);
-		} else {
-			var value = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{value: value}),
-				elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'SetFile':
+				var file = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							file: elm$core$Maybe$Just(file)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'CodeChanged':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{value: value}),
+					elm$core$Platform$Cmd$none);
+			case 'TriggerCoordinates':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{triggerCoordinates: model.triggerCoordinates + 1}),
+					elm$core$Platform$Cmd$none);
+			case 'TriggerSelection':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{triggerSelection: model.triggerSelection + 1}),
+					elm$core$Platform$Cmd$none);
+			case 'Coordinates':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							coordinates: elm$core$Maybe$Just(value)
+						}),
+					elm$core$Platform$Cmd$none);
+			default:
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							selection: elm$core$Maybe$Just(value)
+						}),
+					elm$core$Platform$Cmd$none);
 		}
 	});
 var elm$core$Basics$identity = function (x) {
@@ -5024,12 +5055,116 @@ var billstclair$elm_custom_element$CustomElement$FileListener$onLoad = function 
 					['target', 'contents']),
 				billstclair$elm_custom_element$CustomElement$FileListener$fileDecoder)));
 };
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$Coordinates = F4(
+	function (id, selectionStart, selectionEnd, caretCoordinates) {
+		return {caretCoordinates: caretCoordinates, id: id, selectionEnd: selectionEnd, selectionStart: selectionStart};
+	});
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$CaretCoordinates = F3(
+	function (top, left, lineheight) {
+		return {left: left, lineheight: lineheight, top: top};
+	});
+var elm$json$Json$Decode$map3 = _Json_map3;
+var elm$json$Json$Decode$oneOf = _Json_oneOf;
+var elm$json$Json$Decode$maybe = function (decoder) {
+	return elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder),
+				elm$json$Json$Decode$succeed(elm$core$Maybe$Nothing)
+			]));
+};
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$caretCoordinatesDecoder = A4(
+	elm$json$Json$Decode$map3,
+	billstclair$elm_custom_element$CustomElement$TextAreaTracker$CaretCoordinates,
+	A2(elm$json$Json$Decode$field, 'top', elm$json$Json$Decode$int),
+	A2(elm$json$Json$Decode$field, 'left', elm$json$Json$Decode$int),
+	A2(
+		elm$json$Json$Decode$field,
+		'height',
+		elm$json$Json$Decode$maybe(elm$json$Json$Decode$int)));
+var elm$json$Json$Decode$map4 = _Json_map4;
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$coordinatesDecoderDebug = function (value) {
+	return A5(
+		elm$json$Json$Decode$map4,
+		billstclair$elm_custom_element$CustomElement$TextAreaTracker$Coordinates,
+		A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
+		A2(elm$json$Json$Decode$field, 'selectionStart', elm$json$Json$Decode$int),
+		A2(elm$json$Json$Decode$field, 'selectionEnd', elm$json$Json$Decode$int),
+		A2(elm$json$Json$Decode$field, 'caretCoordinates', billstclair$elm_custom_element$CustomElement$TextAreaTracker$caretCoordinatesDecoder));
+};
+var elm$json$Json$Decode$andThen = _Json_andThen;
+var elm$json$Json$Decode$value = _Json_decodeValue;
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$coordinatesDecoder = A2(elm$json$Json$Decode$andThen, billstclair$elm_custom_element$CustomElement$TextAreaTracker$coordinatesDecoderDebug, elm$json$Json$Decode$value);
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$onCoordinates = function (tagger) {
+	return A2(
+		elm$html$Html$Events$on,
+		'caretCoordinates',
+		A2(
+			elm$json$Json$Decode$map,
+			tagger,
+			A2(
+				elm$json$Json$Decode$at,
+				_List_fromArray(
+					['target', 'elmProperties']),
+				billstclair$elm_custom_element$CustomElement$TextAreaTracker$coordinatesDecoder)));
+};
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$Selection = F3(
+	function (id, selectionStart, selectionEnd) {
+		return {id: id, selectionEnd: selectionEnd, selectionStart: selectionStart};
+	});
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$selectionDecoder = A4(
+	elm$json$Json$Decode$map3,
+	billstclair$elm_custom_element$CustomElement$TextAreaTracker$Selection,
+	A2(elm$json$Json$Decode$field, 'id', elm$json$Json$Decode$string),
+	A2(elm$json$Json$Decode$field, 'selectionStart', elm$json$Json$Decode$int),
+	A2(elm$json$Json$Decode$field, 'selectionEnd', elm$json$Json$Decode$int));
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$onSelection = function (tagger) {
+	return A2(
+		elm$html$Html$Events$on,
+		'selection',
+		A2(
+			elm$json$Json$Decode$map,
+			tagger,
+			A2(
+				elm$json$Json$Decode$at,
+				_List_fromArray(
+					['target', 'selection']),
+				billstclair$elm_custom_element$CustomElement$TextAreaTracker$selectionDecoder)));
+};
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaId = function (value) {
+	return A2(
+		elm$html$Html$Attributes$property,
+		'textAreaId',
+		elm$json$Json$Encode$string(value));
+};
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaTracker = elm$html$Html$node('text-area-tracker');
+var elm$json$Json$Encode$int = _Json_wrap;
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerCoordinates = function (value) {
+	return A2(
+		elm$html$Html$Attributes$property,
+		'triggerCoordinates',
+		elm$json$Json$Encode$int(value));
+};
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerSelection = function (value) {
+	return A2(
+		elm$html$Html$Attributes$property,
+		'triggerSelection',
+		elm$json$Json$Encode$int(value));
+};
 var billstclair$elm_custom_element$Main$CodeChanged = function (a) {
 	return {$: 'CodeChanged', a: a};
+};
+var billstclair$elm_custom_element$Main$Coordinates = function (a) {
+	return {$: 'Coordinates', a: a};
+};
+var billstclair$elm_custom_element$Main$Selection = function (a) {
+	return {$: 'Selection', a: a};
 };
 var billstclair$elm_custom_element$Main$SetFile = function (a) {
 	return {$: 'SetFile', a: a};
 };
+var billstclair$elm_custom_element$Main$TriggerCoordinates = {$: 'TriggerCoordinates'};
+var billstclair$elm_custom_element$Main$TriggerSelection = {$: 'TriggerSelection'};
 var elm$html$Html$b = _VirtualDom_node('b');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
@@ -5044,6 +5179,15 @@ var billstclair$elm_custom_element$Main$b = function (string) {
 };
 var elm$html$Html$br = _VirtualDom_node('br');
 var billstclair$elm_custom_element$Main$br = A2(elm$html$Html$br, _List_Nil, _List_Nil);
+var billstclair$elm_custom_element$Main$coordinatesToString = function (coordinates) {
+	if (coordinates.$ === 'Nothing') {
+		return 'Click \'Trigger Coordinates\' to update.';
+	} else {
+		var c = coordinates.a;
+		var cc = c.caretCoordinates;
+		return ('{ id = \"' + (c.id + '\"\n')) + ((', selectionStart = ' + (elm$core$String$fromInt(c.selectionStart) + '\n')) + ((', selectionEnd = ' + (elm$core$String$fromInt(c.selectionEnd) + '\n')) + (', caretCoordinates = \n' + (('   { top = ' + (elm$core$String$fromInt(cc.top) + '\n')) + (('   , left = ' + (elm$core$String$fromInt(cc.left) + '\n')) + ('   }\n' + '}'))))));
+	}
+};
 var elm$core$Char$fromCode = _Char_fromCode;
 var elm$core$String$fromList = _String_fromList;
 var billstclair$elm_custom_element$Main$copyright = elm$core$String$fromList(
@@ -5051,19 +5195,65 @@ var billstclair$elm_custom_element$Main$copyright = elm$core$String$fromList(
 		[
 			elm$core$Char$fromCode(169)
 		]));
+var billstclair$elm_custom_element$Main$selectionToString = function (selection) {
+	if (selection.$ === 'Nothing') {
+		return 'Click \'Trigger Selection\' to update.';
+	} else {
+		var s = selection.a;
+		return ('{ id = \"' + (s.id + '\"\n')) + ((', selectionStart = ' + (elm$core$String$fromInt(s.selectionStart) + '\n')) + ((', selectionEnd = ' + (elm$core$String$fromInt(s.selectionEnd) + '\n')) + '}'));
+	}
+};
+var billstclair$elm_custom_element$Main$borderStyle = '1px solid black';
+var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var billstclair$elm_custom_element$Main$borderAttributes = _List_fromArray(
+	[
+		A2(elm$html$Html$Attributes$style, 'border', billstclair$elm_custom_element$Main$borderStyle),
+		A2(elm$html$Html$Attributes$style, 'vertical-align', 'top')
+	]);
+var elm$html$Html$table = _VirtualDom_node('table');
+var billstclair$elm_custom_element$Main$table = function (rows) {
+	return A2(elm$html$Html$table, billstclair$elm_custom_element$Main$borderAttributes, rows);
+};
+var elm$html$Html$td = _VirtualDom_node('td');
+var billstclair$elm_custom_element$Main$td = function (elements) {
+	return A2(elm$html$Html$td, billstclair$elm_custom_element$Main$borderAttributes, elements);
+};
+var elm$html$Html$th = _VirtualDom_node('th');
+var billstclair$elm_custom_element$Main$th = function (elements) {
+	return A2(elm$html$Html$th, billstclair$elm_custom_element$Main$borderAttributes, elements);
+};
+var elm$html$Html$tr = _VirtualDom_node('tr');
+var billstclair$elm_custom_element$Main$tr = function (columns) {
+	return A2(elm$html$Html$tr, _List_Nil, columns);
+};
 var elm$html$Html$a = _VirtualDom_node('a');
+var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$h2 = _VirtualDom_node('h2');
 var elm$html$Html$img = _VirtualDom_node('img');
 var elm$html$Html$p = _VirtualDom_node('p');
 var elm$html$Html$pre = _VirtualDom_node('pre');
+var elm$html$Html$textarea = _VirtualDom_node('textarea');
 var elm$html$Html$Attributes$accept = elm$html$Html$Attributes$stringProperty('accept');
+var elm$html$Html$Attributes$cols = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'cols',
+		elm$core$String$fromInt(n));
+};
 var elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		elm$html$Html$Attributes$stringProperty,
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
+};
+var elm$html$Html$Attributes$rows = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'rows',
+		elm$core$String$fromInt(n));
 };
 var elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -5076,6 +5266,12 @@ var elm$html$Html$Attributes$width = function (n) {
 		_VirtualDom_attribute,
 		'width',
 		elm$core$String$fromInt(n));
+};
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
 };
 var elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
@@ -5345,6 +5541,120 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 				_List_fromArray(
 					[
 						elm$html$Html$text('Examples of custom elements, used by Elm.')
+					])),
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('text-area-tracker Custom Element')
+					])),
+				A2(
+				elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Edit the text below and click a \'Trigger\' button.')
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$id('textarea'),
+								elm$html$Html$Attributes$rows(10),
+								elm$html$Html$Attributes$cols(80)
+							]),
+						_List_Nil),
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$button,
+								_List_fromArray(
+									[
+										elm$html$Html$Events$onClick(billstclair$elm_custom_element$Main$TriggerCoordinates)
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Trigger Coordinates')
+									])),
+								elm$html$Html$text(' '),
+								A2(
+								elm$html$Html$button,
+								_List_fromArray(
+									[
+										elm$html$Html$Events$onClick(billstclair$elm_custom_element$Main$TriggerSelection)
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Trigger Selection')
+									]))
+							])),
+						billstclair$elm_custom_element$Main$table(
+						_List_fromArray(
+							[
+								billstclair$elm_custom_element$Main$tr(
+								_List_fromArray(
+									[
+										billstclair$elm_custom_element$Main$th(
+										_List_fromArray(
+											[
+												elm$html$Html$text('Coordinates')
+											])),
+										billstclair$elm_custom_element$Main$th(
+										_List_fromArray(
+											[
+												elm$html$Html$text('Selection')
+											]))
+									])),
+								billstclair$elm_custom_element$Main$tr(
+								_List_fromArray(
+									[
+										billstclair$elm_custom_element$Main$td(
+										_List_fromArray(
+											[
+												A2(
+												elm$html$Html$pre,
+												_List_Nil,
+												_List_fromArray(
+													[
+														elm$html$Html$text(
+														billstclair$elm_custom_element$Main$coordinatesToString(model.coordinates))
+													]))
+											])),
+										billstclair$elm_custom_element$Main$td(
+										_List_fromArray(
+											[
+												A2(
+												elm$html$Html$pre,
+												_List_Nil,
+												_List_fromArray(
+													[
+														elm$html$Html$text(
+														billstclair$elm_custom_element$Main$selectionToString(model.selection))
+													]))
+											]))
+									]))
+							])),
+						A2(
+						billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaTracker,
+						_List_fromArray(
+							[
+								billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaId('textarea'),
+								billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerCoordinates(model.triggerCoordinates),
+								billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerSelection(model.triggerSelection),
+								billstclair$elm_custom_element$CustomElement$TextAreaTracker$onCoordinates(billstclair$elm_custom_element$Main$Coordinates),
+								billstclair$elm_custom_element$CustomElement$TextAreaTracker$onSelection(billstclair$elm_custom_element$Main$Selection),
+								elm$html$Html$Attributes$id('tracker')
+							]),
+						_List_Nil)
 					])),
 				A2(
 				elm$html$Html$h2,
