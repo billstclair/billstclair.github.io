@@ -3856,43 +3856,6 @@ function _VirtualDom_dekey(keyedNode)
 
 
 
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
 
 // ELEMENT
 
@@ -4326,6 +4289,43 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var elm$core$Array$foldr = F3(
 	function (func, baseCase, _n0) {
@@ -4805,117 +4805,36 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var billstclair$elm_custom_element$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{coordinates: elm$core$Maybe$Nothing, file: elm$core$Maybe$Nothing, selection: elm$core$Maybe$Nothing, text: 'Four score and seven years ago,\nOur forefathers set forth...', triggerCoordinates: 0, triggerSelection: 0, value: 'module Main exposing (main)' + ('\n\n' + ('import Html' + ('\n\n' + 'main = Html.text \"Hello, World!\"')))},
+		{coordinates: elm$core$Maybe$Nothing, file: elm$core$Maybe$Nothing, selection: elm$core$Maybe$Nothing, selectionEnd: '10', selectionStart: '1', setSelection: 0, text: 'Four score and seven years ago,\nOur forefathers set forth...', triggerCoordinates: 0, triggerSelection: 0, value: 'module Main exposing (main)' + ('\n\n' + ('import Html' + ('\n\n' + 'main = Html.text \"Hello, World!\"')))},
 		elm$core$Platform$Cmd$none);
 };
-var billstclair$elm_custom_element$Main$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'SetFile':
-				var file = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							file: elm$core$Maybe$Just(file)
-						}),
-					elm$core$Platform$Cmd$none);
-			case 'CodeChanged':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{value: value}),
-					elm$core$Platform$Cmd$none);
-			case 'SetText':
-				var text = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{text: text}),
-					elm$core$Platform$Cmd$none);
-			case 'TriggerCoordinates':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{triggerCoordinates: model.triggerCoordinates + 1}),
-					elm$core$Platform$Cmd$none);
-			case 'TriggerSelection':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{triggerSelection: model.triggerSelection + 1}),
-					elm$core$Platform$Cmd$none);
-			case 'Coordinates':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							coordinates: elm$core$Maybe$Just(value)
-						}),
-					elm$core$Platform$Cmd$none);
-			default:
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							selection: elm$core$Maybe$Just(value)
-						}),
-					elm$core$Platform$Cmd$none);
-		}
-	});
+var billstclair$elm_custom_element$Main$Noop = {$: 'Noop'};
+var elm$browser$Browser$External = function (a) {
+	return {$: 'External', a: a};
+};
+var elm$browser$Browser$Internal = function (a) {
+	return {$: 'Internal', a: a};
+};
+var elm$browser$Browser$Dom$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
+};
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0.a;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
-var elm$json$Json$Decode$map = _Json_map1;
-var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$json$Json$Decode$succeed = _Json_succeed;
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
+var elm$core$Task$Perform = function (a) {
+	return {$: 'Perform', a: a};
 };
-var elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
-};
-var elm$html$Html$node = elm$virtual_dom$VirtualDom$node;
-var billstclair$elm_custom_element$CustomElement$CodeEditor$codeEditor = elm$html$Html$node('code-editor');
-var elm$virtual_dom$VirtualDom$property = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_property,
-			_VirtualDom_noInnerHtmlOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var elm$html$Html$Attributes$property = elm$virtual_dom$VirtualDom$property;
-var elm$json$Json$Encode$string = _Json_wrap;
-var billstclair$elm_custom_element$CustomElement$CodeEditor$editorValue = function (value) {
-	return A2(
-		elm$html$Html$Attributes$property,
-		'editorValue',
-		elm$json$Json$Encode$string(value));
-};
-var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
+var elm$core$Task$succeed = _Scheduler_succeed;
+var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -4970,6 +4889,384 @@ var elm$core$List$foldrHelper = F4(
 var elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var elm$core$Task$andThen = _Scheduler_andThen;
+var elm$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			elm$core$Task$andThen,
+			function (a) {
+				return elm$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var elm$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			elm$core$Task$andThen,
+			function (a) {
+				return A2(
+					elm$core$Task$andThen,
+					function (b) {
+						return elm$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var elm$core$Task$sequence = function (tasks) {
+	return A3(
+		elm$core$List$foldr,
+		elm$core$Task$map2(elm$core$List$cons),
+		elm$core$Task$succeed(_List_Nil),
+		tasks);
+};
+var elm$core$Platform$sendToApp = _Platform_sendToApp;
+var elm$core$Task$spawnCmd = F2(
+	function (router, _n0) {
+		var task = _n0.a;
+		return _Scheduler_spawn(
+			A2(
+				elm$core$Task$andThen,
+				elm$core$Platform$sendToApp(router),
+				task));
+	});
+var elm$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			elm$core$Task$map,
+			function (_n0) {
+				return _Utils_Tuple0;
+			},
+			elm$core$Task$sequence(
+				A2(
+					elm$core$List$map,
+					elm$core$Task$spawnCmd(router),
+					commands)));
+	});
+var elm$core$Task$onSelfMsg = F3(
+	function (_n0, _n1, _n2) {
+		return elm$core$Task$succeed(_Utils_Tuple0);
+	});
+var elm$core$Task$cmdMap = F2(
+	function (tagger, _n0) {
+		var task = _n0.a;
+		return elm$core$Task$Perform(
+			A2(elm$core$Task$map, tagger, task));
+	});
+_Platform_effectManagers['Task'] = _Platform_createManager(elm$core$Task$init, elm$core$Task$onEffects, elm$core$Task$onSelfMsg, elm$core$Task$cmdMap);
+var elm$core$Task$command = _Platform_leaf('Task');
+var elm$core$Task$perform = F2(
+	function (toMessage, task) {
+		return elm$core$Task$command(
+			elm$core$Task$Perform(
+				A2(elm$core$Task$map, toMessage, task)));
+	});
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$json$Json$Decode$succeed = _Json_succeed;
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$core$String$length = _String_length;
+var elm$core$String$slice = _String_slice;
+var elm$core$String$dropLeft = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3(
+			elm$core$String$slice,
+			n,
+			elm$core$String$length(string),
+			string);
+	});
+var elm$core$String$startsWith = _String_startsWith;
+var elm$url$Url$Http = {$: 'Http'};
+var elm$url$Url$Https = {$: 'Https'};
+var elm$core$String$indexes = _String_indexes;
+var elm$core$String$isEmpty = function (string) {
+	return string === '';
+};
+var elm$core$String$left = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
+	});
+var elm$core$String$contains = _String_contains;
+var elm$core$String$toInt = _String_toInt;
+var elm$url$Url$Url = F6(
+	function (protocol, host, port_, path, query, fragment) {
+		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
+	});
+var elm$url$Url$chompBeforePath = F5(
+	function (protocol, path, params, frag, str) {
+		if (elm$core$String$isEmpty(str) || A2(elm$core$String$contains, '@', str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, ':', str);
+			if (!_n0.b) {
+				return elm$core$Maybe$Just(
+					A6(elm$url$Url$Url, protocol, str, elm$core$Maybe$Nothing, path, params, frag));
+			} else {
+				if (!_n0.b.b) {
+					var i = _n0.a;
+					var _n1 = elm$core$String$toInt(
+						A2(elm$core$String$dropLeft, i + 1, str));
+					if (_n1.$ === 'Nothing') {
+						return elm$core$Maybe$Nothing;
+					} else {
+						var port_ = _n1;
+						return elm$core$Maybe$Just(
+							A6(
+								elm$url$Url$Url,
+								protocol,
+								A2(elm$core$String$left, i, str),
+								port_,
+								path,
+								params,
+								frag));
+					}
+				} else {
+					return elm$core$Maybe$Nothing;
+				}
+			}
+		}
+	});
+var elm$url$Url$chompBeforeQuery = F4(
+	function (protocol, params, frag, str) {
+		if (elm$core$String$isEmpty(str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, '/', str);
+			if (!_n0.b) {
+				return A5(elm$url$Url$chompBeforePath, protocol, '/', params, frag, str);
+			} else {
+				var i = _n0.a;
+				return A5(
+					elm$url$Url$chompBeforePath,
+					protocol,
+					A2(elm$core$String$dropLeft, i, str),
+					params,
+					frag,
+					A2(elm$core$String$left, i, str));
+			}
+		}
+	});
+var elm$url$Url$chompBeforeFragment = F3(
+	function (protocol, frag, str) {
+		if (elm$core$String$isEmpty(str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, '?', str);
+			if (!_n0.b) {
+				return A4(elm$url$Url$chompBeforeQuery, protocol, elm$core$Maybe$Nothing, frag, str);
+			} else {
+				var i = _n0.a;
+				return A4(
+					elm$url$Url$chompBeforeQuery,
+					protocol,
+					elm$core$Maybe$Just(
+						A2(elm$core$String$dropLeft, i + 1, str)),
+					frag,
+					A2(elm$core$String$left, i, str));
+			}
+		}
+	});
+var elm$url$Url$chompAfterProtocol = F2(
+	function (protocol, str) {
+		if (elm$core$String$isEmpty(str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, '#', str);
+			if (!_n0.b) {
+				return A3(elm$url$Url$chompBeforeFragment, protocol, elm$core$Maybe$Nothing, str);
+			} else {
+				var i = _n0.a;
+				return A3(
+					elm$url$Url$chompBeforeFragment,
+					protocol,
+					elm$core$Maybe$Just(
+						A2(elm$core$String$dropLeft, i + 1, str)),
+					A2(elm$core$String$left, i, str));
+			}
+		}
+	});
+var elm$url$Url$fromString = function (str) {
+	return A2(elm$core$String$startsWith, 'http://', str) ? A2(
+		elm$url$Url$chompAfterProtocol,
+		elm$url$Url$Http,
+		A2(elm$core$String$dropLeft, 7, str)) : (A2(elm$core$String$startsWith, 'https://', str) ? A2(
+		elm$url$Url$chompAfterProtocol,
+		elm$url$Url$Https,
+		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
+};
+var elm$browser$Browser$Dom$focus = _Browser_call('focus');
+var elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var elm$core$Task$onError = _Scheduler_onError;
+var elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return elm$core$Task$command(
+			elm$core$Task$Perform(
+				A2(
+					elm$core$Task$onError,
+					A2(
+						elm$core$Basics$composeL,
+						A2(elm$core$Basics$composeL, elm$core$Task$succeed, resultToMessage),
+						elm$core$Result$Err),
+					A2(
+						elm$core$Task$andThen,
+						A2(
+							elm$core$Basics$composeL,
+							A2(elm$core$Basics$composeL, elm$core$Task$succeed, resultToMessage),
+							elm$core$Result$Ok),
+						task))));
+	});
+var billstclair$elm_custom_element$Main$focusId = function (id) {
+	return A2(
+		elm$core$Task$attempt,
+		function (_n0) {
+			return billstclair$elm_custom_element$Main$Noop;
+		},
+		elm$browser$Browser$Dom$focus(id));
+};
+var billstclair$elm_custom_element$Main$textAreaId = 'textarea';
+var billstclair$elm_custom_element$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Noop':
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			case 'SetFile':
+				var file = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							file: elm$core$Maybe$Just(file)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'CodeChanged':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{value: value}),
+					elm$core$Platform$Cmd$none);
+			case 'SetText':
+				var text = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{text: text}),
+					elm$core$Platform$Cmd$none);
+			case 'SetStart':
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{selectionStart: string}),
+					elm$core$Platform$Cmd$none);
+			case 'SetEnd':
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{selectionEnd: string}),
+					elm$core$Platform$Cmd$none);
+			case 'SetSelection':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{setSelection: model.setSelection + 1}),
+					billstclair$elm_custom_element$Main$focusId(billstclair$elm_custom_element$Main$textAreaId));
+			case 'TriggerCoordinates':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{triggerCoordinates: model.triggerCoordinates + 1}),
+					elm$core$Platform$Cmd$none);
+			case 'TriggerSelection':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{triggerSelection: model.triggerSelection + 1}),
+					elm$core$Platform$Cmd$none);
+			case 'Coordinates':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							coordinates: elm$core$Maybe$Just(value)
+						}),
+					elm$core$Platform$Cmd$none);
+			default:
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							selection: elm$core$Maybe$Just(value)
+						}),
+					elm$core$Platform$Cmd$none);
+		}
+	});
+var elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var elm$html$Html$node = elm$virtual_dom$VirtualDom$node;
+var billstclair$elm_custom_element$CustomElement$CodeEditor$codeEditor = elm$html$Html$node('code-editor');
+var elm$virtual_dom$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var elm$html$Html$Attributes$property = elm$virtual_dom$VirtualDom$property;
+var elm$json$Json$Encode$string = _Json_wrap;
+var billstclair$elm_custom_element$CustomElement$CodeEditor$editorValue = function (value) {
+	return A2(
+		elm$html$Html$Attributes$property,
+		'editorValue',
+		elm$json$Json$Encode$string(value));
+};
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
 var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$at = F2(
@@ -5138,6 +5435,43 @@ var billstclair$elm_custom_element$CustomElement$TextAreaTracker$onSelection = f
 					['target', 'selection']),
 				billstclair$elm_custom_element$CustomElement$TextAreaTracker$selectionDecoder)));
 };
+var elm$json$Json$Encode$int = _Json_wrap;
+var elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, obj) {
+					var k = _n0.a;
+					var v = _n0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$encodeSetSelection = F3(
+	function (start, end, count) {
+		return elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'start',
+					elm$json$Json$Encode$int(start)),
+					_Utils_Tuple2(
+					'end',
+					elm$json$Json$Encode$int(end)),
+					_Utils_Tuple2(
+					'count',
+					elm$json$Json$Encode$int(count))
+				]));
+	});
+var billstclair$elm_custom_element$CustomElement$TextAreaTracker$setSelection = F3(
+	function (start, end, count) {
+		return A2(
+			elm$html$Html$Attributes$property,
+			'setSelection',
+			A3(billstclair$elm_custom_element$CustomElement$TextAreaTracker$encodeSetSelection, start, end, count));
+	});
 var billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaId = function (value) {
 	return A2(
 		elm$html$Html$Attributes$property,
@@ -5145,7 +5479,6 @@ var billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaId = fu
 		elm$json$Json$Encode$string(value));
 };
 var billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaTracker = elm$html$Html$node('text-area-tracker');
-var elm$json$Json$Encode$int = _Json_wrap;
 var billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerCoordinates = function (value) {
 	return A2(
 		elm$html$Html$Attributes$property,
@@ -5167,8 +5500,15 @@ var billstclair$elm_custom_element$Main$Coordinates = function (a) {
 var billstclair$elm_custom_element$Main$Selection = function (a) {
 	return {$: 'Selection', a: a};
 };
+var billstclair$elm_custom_element$Main$SetEnd = function (a) {
+	return {$: 'SetEnd', a: a};
+};
 var billstclair$elm_custom_element$Main$SetFile = function (a) {
 	return {$: 'SetFile', a: a};
+};
+var billstclair$elm_custom_element$Main$SetSelection = {$: 'SetSelection'};
+var billstclair$elm_custom_element$Main$SetStart = function (a) {
+	return {$: 'SetStart', a: a};
 };
 var billstclair$elm_custom_element$Main$SetText = function (a) {
 	return {$: 'SetText', a: a};
@@ -5237,6 +5577,15 @@ var elm$html$Html$tr = _VirtualDom_node('tr');
 var billstclair$elm_custom_element$Main$tr = function (columns) {
 	return A2(elm$html$Html$tr, _List_Nil, columns);
 };
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$div = _VirtualDom_node('div');
@@ -5265,12 +5614,19 @@ var elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		elm$core$String$fromInt(n));
 };
+var elm$html$Html$Attributes$size = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'size',
+		elm$core$String$fromInt(n));
+};
 var elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		elm$html$Html$Attributes$stringProperty,
 		'src',
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$html$Html$Attributes$width = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -5502,7 +5858,6 @@ var elm$core$String$cons = _String_cons;
 var elm$core$String$fromChar = function (_char) {
 	return A2(elm$core$String$cons, _char, '');
 };
-var elm$core$String$length = _String_length;
 var elm$core$Bitwise$and = _Bitwise_and;
 var elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
 var elm$core$String$repeatHelp = F3(
@@ -5591,7 +5946,9 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text('Edit the text below and click a \'Trigger\' button.')
+						elm$html$Html$text('Edit the text below and click a \'Trigger\' button.'),
+						billstclair$elm_custom_element$Main$br,
+						elm$html$Html$text('Or change \'Start\' and \'End\' and click \'Set Selection\'.')
 					])),
 				A2(
 				elm$html$Html$div,
@@ -5602,7 +5959,7 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 						elm$html$Html$textarea,
 						_List_fromArray(
 							[
-								elm$html$Html$Attributes$id('textarea'),
+								elm$html$Html$Attributes$id(billstclair$elm_custom_element$Main$textAreaId),
 								elm$html$Html$Attributes$rows(10),
 								elm$html$Html$Attributes$cols(80),
 								elm$html$Html$Events$onInput(billstclair$elm_custom_element$Main$SetText)
@@ -5616,6 +5973,40 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
+								elm$html$Html$text('Start: '),
+								A2(
+								elm$html$Html$input,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$type_('text'),
+										elm$html$Html$Attributes$size(3),
+										elm$html$Html$Events$onInput(billstclair$elm_custom_element$Main$SetStart),
+										elm$html$Html$Attributes$value(model.selectionStart)
+									]),
+								_List_Nil),
+								elm$html$Html$text(' End: '),
+								A2(
+								elm$html$Html$input,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$type_('text'),
+										elm$html$Html$Attributes$size(3),
+										elm$html$Html$Events$onInput(billstclair$elm_custom_element$Main$SetEnd),
+										elm$html$Html$Attributes$value(model.selectionEnd)
+									]),
+								_List_Nil),
+								elm$html$Html$text(' '),
+								A2(
+								elm$html$Html$button,
+								_List_fromArray(
+									[
+										elm$html$Html$Events$onClick(billstclair$elm_custom_element$Main$SetSelection)
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Set Selection')
+									])),
+								billstclair$elm_custom_element$Main$br,
 								A2(
 								elm$html$Html$button,
 								_List_fromArray(
@@ -5684,18 +6075,30 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 											]))
 									]))
 							])),
-						A2(
-						billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaTracker,
-						_List_fromArray(
-							[
-								billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaId('textarea'),
-								billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerCoordinates(model.triggerCoordinates),
-								billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerSelection(model.triggerSelection),
-								billstclair$elm_custom_element$CustomElement$TextAreaTracker$onCoordinates(billstclair$elm_custom_element$Main$Coordinates),
-								billstclair$elm_custom_element$CustomElement$TextAreaTracker$onSelection(billstclair$elm_custom_element$Main$Selection),
-								elm$html$Html$Attributes$id('tracker')
-							]),
-						_List_Nil)
+						function () {
+						var start = A2(
+							elm$core$Maybe$withDefault,
+							0,
+							elm$core$String$toInt(model.selectionStart));
+						var end = A2(
+							elm$core$Maybe$withDefault,
+							0,
+							elm$core$String$toInt(model.selectionEnd));
+						var count = model.setSelection;
+						return A2(
+							billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaTracker,
+							_List_fromArray(
+								[
+									billstclair$elm_custom_element$CustomElement$TextAreaTracker$textAreaId(billstclair$elm_custom_element$Main$textAreaId),
+									A3(billstclair$elm_custom_element$CustomElement$TextAreaTracker$setSelection, start, end, count),
+									billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerCoordinates(model.triggerCoordinates),
+									billstclair$elm_custom_element$CustomElement$TextAreaTracker$triggerSelection(model.triggerSelection),
+									billstclair$elm_custom_element$CustomElement$TextAreaTracker$onCoordinates(billstclair$elm_custom_element$Main$Coordinates),
+									billstclair$elm_custom_element$CustomElement$TextAreaTracker$onSelection(billstclair$elm_custom_element$Main$Selection),
+									elm$html$Html$Attributes$id('tracker')
+								]),
+							_List_Nil);
+					}()
 					])),
 				A2(
 				elm$html$Html$h2,
@@ -5834,245 +6237,6 @@ var billstclair$elm_custom_element$Main$view = function (model) {
 							]))
 					]))
 			]));
-};
-var elm$browser$Browser$External = function (a) {
-	return {$: 'External', a: a};
-};
-var elm$browser$Browser$Internal = function (a) {
-	return {$: 'Internal', a: a};
-};
-var elm$browser$Browser$Dom$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0.a;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
-	}
-};
-var elm$core$Task$Perform = function (a) {
-	return {$: 'Perform', a: a};
-};
-var elm$core$Task$succeed = _Scheduler_succeed;
-var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
-var elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
-var elm$core$Task$andThen = _Scheduler_andThen;
-var elm$core$Task$map = F2(
-	function (func, taskA) {
-		return A2(
-			elm$core$Task$andThen,
-			function (a) {
-				return elm$core$Task$succeed(
-					func(a));
-			},
-			taskA);
-	});
-var elm$core$Task$map2 = F3(
-	function (func, taskA, taskB) {
-		return A2(
-			elm$core$Task$andThen,
-			function (a) {
-				return A2(
-					elm$core$Task$andThen,
-					function (b) {
-						return elm$core$Task$succeed(
-							A2(func, a, b));
-					},
-					taskB);
-			},
-			taskA);
-	});
-var elm$core$Task$sequence = function (tasks) {
-	return A3(
-		elm$core$List$foldr,
-		elm$core$Task$map2(elm$core$List$cons),
-		elm$core$Task$succeed(_List_Nil),
-		tasks);
-};
-var elm$core$Platform$sendToApp = _Platform_sendToApp;
-var elm$core$Task$spawnCmd = F2(
-	function (router, _n0) {
-		var task = _n0.a;
-		return _Scheduler_spawn(
-			A2(
-				elm$core$Task$andThen,
-				elm$core$Platform$sendToApp(router),
-				task));
-	});
-var elm$core$Task$onEffects = F3(
-	function (router, commands, state) {
-		return A2(
-			elm$core$Task$map,
-			function (_n0) {
-				return _Utils_Tuple0;
-			},
-			elm$core$Task$sequence(
-				A2(
-					elm$core$List$map,
-					elm$core$Task$spawnCmd(router),
-					commands)));
-	});
-var elm$core$Task$onSelfMsg = F3(
-	function (_n0, _n1, _n2) {
-		return elm$core$Task$succeed(_Utils_Tuple0);
-	});
-var elm$core$Task$cmdMap = F2(
-	function (tagger, _n0) {
-		var task = _n0.a;
-		return elm$core$Task$Perform(
-			A2(elm$core$Task$map, tagger, task));
-	});
-_Platform_effectManagers['Task'] = _Platform_createManager(elm$core$Task$init, elm$core$Task$onEffects, elm$core$Task$onSelfMsg, elm$core$Task$cmdMap);
-var elm$core$Task$command = _Platform_leaf('Task');
-var elm$core$Task$perform = F2(
-	function (toMessage, task) {
-		return elm$core$Task$command(
-			elm$core$Task$Perform(
-				A2(elm$core$Task$map, toMessage, task)));
-	});
-var elm$core$String$slice = _String_slice;
-var elm$core$String$dropLeft = F2(
-	function (n, string) {
-		return (n < 1) ? string : A3(
-			elm$core$String$slice,
-			n,
-			elm$core$String$length(string),
-			string);
-	});
-var elm$core$String$startsWith = _String_startsWith;
-var elm$url$Url$Http = {$: 'Http'};
-var elm$url$Url$Https = {$: 'Https'};
-var elm$core$String$indexes = _String_indexes;
-var elm$core$String$isEmpty = function (string) {
-	return string === '';
-};
-var elm$core$String$left = F2(
-	function (n, string) {
-		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
-	});
-var elm$core$String$contains = _String_contains;
-var elm$core$String$toInt = _String_toInt;
-var elm$url$Url$Url = F6(
-	function (protocol, host, port_, path, query, fragment) {
-		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
-	});
-var elm$url$Url$chompBeforePath = F5(
-	function (protocol, path, params, frag, str) {
-		if (elm$core$String$isEmpty(str) || A2(elm$core$String$contains, '@', str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, ':', str);
-			if (!_n0.b) {
-				return elm$core$Maybe$Just(
-					A6(elm$url$Url$Url, protocol, str, elm$core$Maybe$Nothing, path, params, frag));
-			} else {
-				if (!_n0.b.b) {
-					var i = _n0.a;
-					var _n1 = elm$core$String$toInt(
-						A2(elm$core$String$dropLeft, i + 1, str));
-					if (_n1.$ === 'Nothing') {
-						return elm$core$Maybe$Nothing;
-					} else {
-						var port_ = _n1;
-						return elm$core$Maybe$Just(
-							A6(
-								elm$url$Url$Url,
-								protocol,
-								A2(elm$core$String$left, i, str),
-								port_,
-								path,
-								params,
-								frag));
-					}
-				} else {
-					return elm$core$Maybe$Nothing;
-				}
-			}
-		}
-	});
-var elm$url$Url$chompBeforeQuery = F4(
-	function (protocol, params, frag, str) {
-		if (elm$core$String$isEmpty(str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, '/', str);
-			if (!_n0.b) {
-				return A5(elm$url$Url$chompBeforePath, protocol, '/', params, frag, str);
-			} else {
-				var i = _n0.a;
-				return A5(
-					elm$url$Url$chompBeforePath,
-					protocol,
-					A2(elm$core$String$dropLeft, i, str),
-					params,
-					frag,
-					A2(elm$core$String$left, i, str));
-			}
-		}
-	});
-var elm$url$Url$chompBeforeFragment = F3(
-	function (protocol, frag, str) {
-		if (elm$core$String$isEmpty(str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, '?', str);
-			if (!_n0.b) {
-				return A4(elm$url$Url$chompBeforeQuery, protocol, elm$core$Maybe$Nothing, frag, str);
-			} else {
-				var i = _n0.a;
-				return A4(
-					elm$url$Url$chompBeforeQuery,
-					protocol,
-					elm$core$Maybe$Just(
-						A2(elm$core$String$dropLeft, i + 1, str)),
-					frag,
-					A2(elm$core$String$left, i, str));
-			}
-		}
-	});
-var elm$url$Url$chompAfterProtocol = F2(
-	function (protocol, str) {
-		if (elm$core$String$isEmpty(str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, '#', str);
-			if (!_n0.b) {
-				return A3(elm$url$Url$chompBeforeFragment, protocol, elm$core$Maybe$Nothing, str);
-			} else {
-				var i = _n0.a;
-				return A3(
-					elm$url$Url$chompBeforeFragment,
-					protocol,
-					elm$core$Maybe$Just(
-						A2(elm$core$String$dropLeft, i + 1, str)),
-					A2(elm$core$String$left, i, str));
-			}
-		}
-	});
-var elm$url$Url$fromString = function (str) {
-	return A2(elm$core$String$startsWith, 'http://', str) ? A2(
-		elm$url$Url$chompAfterProtocol,
-		elm$url$Url$Http,
-		A2(elm$core$String$dropLeft, 7, str)) : (A2(elm$core$String$startsWith, 'https://', str) ? A2(
-		elm$url$Url$chompAfterProtocol,
-		elm$url$Url$Https,
-		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$element = _Browser_element;
 var elm$core$Platform$Sub$batch = _Platform_batch;
