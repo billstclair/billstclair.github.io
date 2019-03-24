@@ -4797,7 +4797,7 @@ var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$init = function (sights) {
 	var model = {
 		sights: sights,
-		tableState: author$project$Table$initialSort('Year')
+		tableState: author$project$Table$initialSort('Time')
 	};
 	return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 };
@@ -5053,18 +5053,18 @@ var author$project$Table$customColumn = function (_n0) {
 			A2(elm$core$Basics$composeL, author$project$Table$textDetails, viewData),
 			sorter));
 };
-var author$project$Table$IncOrDec = function (a) {
-	return {$: 'IncOrDec', a: a};
+var author$project$Table$DecOrInc = function (a) {
+	return {$: 'DecOrInc', a: a};
 };
 var elm$core$List$sortBy = _List_sortBy;
-var author$project$Table$increasingOrDecreasingBy = function (toComparable) {
-	return author$project$Table$IncOrDec(
+var author$project$Table$decreasingOrIncreasingBy = function (toComparable) {
+	return author$project$Table$DecOrInc(
 		elm$core$List$sortBy(toComparable));
 };
 var author$project$Main$timeColumn = author$project$Table$customColumn(
 	{
 		name: 'Time',
-		sorter: author$project$Table$increasingOrDecreasingBy(
+		sorter: author$project$Table$decreasingOrIncreasingBy(
 			function ($) {
 				return $.time;
 			}),
@@ -5218,6 +5218,13 @@ var author$project$Table$simpleThead = function (headers) {
 		A2(elm$core$List$map, author$project$Table$simpleTheadHelp, headers));
 };
 var author$project$Table$defaultCustomizations = {caption: elm$core$Maybe$Nothing, rowAttrs: author$project$Table$simpleRowAttrs, tableAttrs: _List_Nil, tbodyAttrs: _List_Nil, tfoot: elm$core$Maybe$Nothing, thead: author$project$Table$simpleThead};
+var author$project$Table$IncOrDec = function (a) {
+	return {$: 'IncOrDec', a: a};
+};
+var author$project$Table$increasingOrDecreasingBy = function (toComparable) {
+	return author$project$Table$IncOrDec(
+		elm$core$List$sortBy(toComparable));
+};
 var elm$core$String$fromFloat = _String_fromNumber;
 var author$project$Table$floatColumn = F2(
 	function (name, toFloat) {
@@ -5414,6 +5421,7 @@ var author$project$Table$onClick = F3(
 					elm$json$Json$Decode$succeed(name),
 					elm$json$Json$Decode$succeed(isReversed))));
 	});
+var elm$core$Basics$neq = _Utils_notEqual;
 var author$project$Table$toHeaderInfo = F3(
 	function (_n0, toMsg, _n1) {
 		var sortName = _n0.a;
@@ -5430,7 +5438,7 @@ var author$project$Table$toHeaderInfo = F3(
 				return _Utils_Tuple3(
 					name,
 					author$project$Table$Sortable(
-						_Utils_eq(name, sortName)),
+						!_Utils_eq(name, sortName)),
 					A3(author$project$Table$onClick, name, false, toMsg));
 			case 'Decreasing':
 				return _Utils_Tuple3(
@@ -5442,7 +5450,7 @@ var author$project$Table$toHeaderInfo = F3(
 				return _Utils_eq(name, sortName) ? _Utils_Tuple3(
 					name,
 					author$project$Table$Reversible(
-						elm$core$Maybe$Just(isReversed)),
+						elm$core$Maybe$Just(!isReversed)),
 					A3(author$project$Table$onClick, name, !isReversed, toMsg)) : _Utils_Tuple3(
 					name,
 					author$project$Table$Reversible(elm$core$Maybe$Nothing),

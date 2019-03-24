@@ -5257,6 +5257,7 @@ var author$project$Table$onClick = F3(
 					elm$json$Json$Decode$succeed(name),
 					elm$json$Json$Decode$succeed(isReversed))));
 	});
+var elm$core$Basics$neq = _Utils_notEqual;
 var elm$core$Basics$not = _Basics_not;
 var author$project$Table$toHeaderInfo = F3(
 	function (_n0, toMsg, _n1) {
@@ -5274,7 +5275,7 @@ var author$project$Table$toHeaderInfo = F3(
 				return _Utils_Tuple3(
 					name,
 					author$project$Table$Sortable(
-						_Utils_eq(name, sortName)),
+						!_Utils_eq(name, sortName)),
 					A3(author$project$Table$onClick, name, false, toMsg));
 			case 'Decreasing':
 				return _Utils_Tuple3(
@@ -5286,7 +5287,7 @@ var author$project$Table$toHeaderInfo = F3(
 				return _Utils_eq(name, sortName) ? _Utils_Tuple3(
 					name,
 					author$project$Table$Reversible(
-						elm$core$Maybe$Just(isReversed)),
+						elm$core$Maybe$Just(!isReversed)),
 					A3(author$project$Table$onClick, name, !isReversed, toMsg)) : _Utils_Tuple3(
 					name,
 					author$project$Table$Reversible(elm$core$Maybe$Nothing),
