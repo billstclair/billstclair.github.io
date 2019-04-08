@@ -5207,20 +5207,28 @@ var billstclair$elm_port_funnel$PortFunnel$makeModuleDesc = F4(
 			A4(billstclair$elm_port_funnel$PortFunnel$ModuleDescRecord, name, encoder, decoder, processor));
 	});
 var author$project$PortFunnel$Geolocation$moduleDesc = A4(billstclair$elm_port_funnel$PortFunnel$makeModuleDesc, author$project$PortFunnel$Geolocation$moduleName, author$project$PortFunnel$Geolocation$encode, author$project$PortFunnel$Geolocation$decode, author$project$PortFunnel$Geolocation$process);
-var author$project$PortFunnel$Geolocation$defaultLocation = {
-	accuracy: 0,
-	altitude: elm$core$Maybe$Nothing,
-	latitude: 0,
-	longitude: 0,
-	movement: elm$core$Maybe$Nothing,
-	timestamp: elm$time$Time$millisToPosix(0)
+var elm$core$Basics$negate = function (n) {
+	return -n;
 };
+var author$project$PortFunnel$Geolocation$defaultLocation = {
+	accuracy: 471,
+	altitude: elm$core$Maybe$Nothing,
+	latitude: 37.7875982,
+	longitude: -122.4018747,
+	movement: elm$core$Maybe$Nothing,
+	timestamp: elm$time$Time$millisToPosix(1537666531262)
+};
+var author$project$PortFunnel$Geolocation$defaultOptions = {enableHighAccuracy: false, maximumAge: elm$core$Maybe$Nothing, timeout: elm$core$Maybe$Nothing};
 var author$project$PortFunnel$Geolocation$simulator = function (message) {
-	if (message.$ === 'GetLocation') {
-		return elm$core$Maybe$Just(
-			author$project$PortFunnel$Geolocation$ReturnedLocation(author$project$PortFunnel$Geolocation$defaultLocation));
-	} else {
-		return elm$core$Maybe$Nothing;
+	switch (message.$) {
+		case 'GetLocation':
+			return elm$core$Maybe$Just(
+				author$project$PortFunnel$Geolocation$ReturnedLocation(author$project$PortFunnel$Geolocation$defaultLocation));
+		case 'SendChanges':
+			return author$project$PortFunnel$Geolocation$simulator(
+				author$project$PortFunnel$Geolocation$GetLocation(author$project$PortFunnel$Geolocation$defaultOptions));
+		default:
+			return elm$core$Maybe$Nothing;
 	}
 };
 var billstclair$elm_port_funnel$PortFunnel$decodeValue = F2(
@@ -5723,7 +5731,6 @@ var author$project$Main$send = F2(
 			author$project$Main$getCmdPort(model),
 			message);
 	});
-var author$project$PortFunnel$Geolocation$defaultOptions = {enableHighAccuracy: false, maximumAge: elm$core$Maybe$Nothing, timeout: elm$core$Maybe$Nothing};
 var author$project$PortFunnel$Geolocation$nowWith = author$project$PortFunnel$Geolocation$GetLocation;
 var author$project$PortFunnel$Geolocation$now = author$project$PortFunnel$Geolocation$nowWith(author$project$PortFunnel$Geolocation$defaultOptions);
 var author$project$PortFunnel$Geolocation$stopWatching = author$project$PortFunnel$Geolocation$StopChanges;
