@@ -5196,7 +5196,8 @@ var $author$project$Main$initialPicker = function () {
 			divAttributes: _List_fromArray(
 				[
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid blue'),
-					A2($elm$html$Html$Attributes$style, 'width', '5em')
+					A2($elm$html$Html$Attributes$style, 'width', '5em'),
+					A2($elm$html$Html$Attributes$style, 'z-index', '10')
 				])
 		});
 }();
@@ -5434,7 +5435,8 @@ var $author$project$PopupPicker$view = F3(
 					[
 						_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'position', 'absolute')
+							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+							A2($elm$html$Html$Attributes$style, 'cursor', 'default')
 						]),
 						picker.divAttributes,
 						picker.positionAttributes
