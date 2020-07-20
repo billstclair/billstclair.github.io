@@ -5183,6 +5183,12 @@ var $author$project$Main$renderInteger = function (_int) {
 				$elm$core$String$fromInt(_int))
 			]));
 };
+var $author$project$PopupPicker$zIndex = function (index) {
+	return A2(
+		$elm$html$Html$Attributes$style,
+		'z-index',
+		$elm$core$String$fromInt(index));
+};
 var $author$project$Main$initialPicker = function () {
 	var picker = A2($author$project$PopupPicker$makePopupPicker, $author$project$Main$renderInteger, $author$project$Main$Choose);
 	return _Utils_update(
@@ -5197,7 +5203,7 @@ var $author$project$Main$initialPicker = function () {
 				[
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid blue'),
 					A2($elm$html$Html$Attributes$style, 'width', '5em'),
-					A2($elm$html$Html$Attributes$style, 'z-index', '10')
+					$author$project$PopupPicker$zIndex(10)
 				])
 		});
 }();
